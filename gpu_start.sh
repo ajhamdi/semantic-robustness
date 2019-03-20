@@ -8,7 +8,7 @@
 #SBATCH -e logs/output.%a.%j.err
 #SBATCH --mem 70GB
 # module purge
-module load cudnn/7.0.3-cuda9.0.176 
+# module load cudnn/7.0.3-cuda9.0.176 
 source activate mytorch
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
