@@ -41,7 +41,11 @@ from IPython.display import display, HTML
 import trimesh
 # trimesh.util.attach_to_log(logging.DEBUG,me)
 
-import neural_renderer as nr
+try:
+    import neural_renderer as nr
+except:
+    sys.path.append('../neural_renderer')
+    import neural_renderer as nr
 
 # data_dir = os.path.join('./', 'data/3d_renderer')
 
