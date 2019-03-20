@@ -19,6 +19,7 @@ import numpy as np
 #     return top_n_df
 
 def main(network, all_points ,class_nb, object_nb , override, reduced, iterations):
+    print("HI")
     # with open(tags_filename, 'r') as fobj:
     #     tags = json.load(fobj)
     # print(bool(all_points),override,reduced)
@@ -30,37 +31,39 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
     object_list =  ['aeroplane',"bathtub",'bench', 'bottle','chair',"cup","piano",'rifle','vase',"toilet"] #["teapot","truck","boat","tv"]
     obj_class_list = [404,435,703,898,559,968,579,413,883,861] # [849,586,606,549] 
     #### define the deep model 
-    resnet = models.resnet50(pretrained=True).eval().to(device)
-    # resnet = nn.DataParallel(resnet)
-    alexnet = models.alexnet(pretrained=True).eval().to(device)
-    # alexnet = nn.DataParallel(alexnet)
-    vgg = models.vgg11_bn(pretrained=True).eval().to(device)
-    # vgg = nn.DataParallel(vgg)
-    incept = models.inception_v3(pretrained=True).eval().to(device)
-    # incept = nn.DataParallel(incept)
-    models_dicts = {"ResNet50":resnet , "AlexNet": alexnet , "VGG":vgg , "Inceptionv3":incept}
+    # resnet = models.resnet50(pretrained=True).eval().to(device)
+    # # resnet = nn.DataParallel(resnet)
+    # alexnet = models.alexnet(pretrained=True).eval().to(device)
+    # # alexnet = nn.DataParallel(alexnet)
+    # vgg = models.vgg11_bn(pretrained=True).eval().to(device)
+    # # vgg = nn.DataParallel(vgg)
+    # incept = models.inception_v3(pretrained=True).eval().to(device)
+    # # incept = nn.DataParallel(incept)
+    # models_dicts = {"ResNet50":resnet , "AlexNet": alexnet , "VGG":vgg , "Inceptionv3":incept}
     setup = {}
     setup["learning_rate"]=0.1 ; setup["alpha"]=0.05 ; setup["beta"]=0.0009; setup["reg"]=0.1  ; setup["n_iterations"]=iterations
     # all_initial_points = [np.array([130,30]),np.array([200,15]),np.array([310,50])]
 
-
     if network == "resnet":
-        network_model =  models_dicts["ResNet50"]  ; network_name = "ResNet50"
+        network_model =  models.resnet50(pretrained=True).eval().to(device)  ; network_name = "ResNet50" 
     elif network == "incept":
-        network_model =  models_dicts["Inceptionv3"]  ; network_name = "Inceptionv3"
+        network_model =  models.inception_v3(pretrained=True).eval().to(device)  ; network_name = "Inceptionv3"
     elif network == "vgg":
-        network_model =  models_dicts["Inceptionv3"]  ; network_name = "Inceptionv3"
+        network_model =  models.vgg11_bn(pretrained=True).eval().to(device)  ; network_name = "VGG"
     elif network == "alexnet":
-        network_model =  models_dicts["Inceptionv3"]  ; network_name = "Inceptionv3"
+        network_model =  models.alexnet(pretrained=True).eval().to(device)  ; network_name = "AlexNet"
     else:
         print("NO available network with this name ... Sorry !")
+        raise Exception("NO NETWORK")
 
     if not all_points:
+        print("HI3333")
         all_initial_points = [np.array([310,50])]
         test_optimization(network_model,network_name,class_nb,object_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
     else :
         print("you asked for all points ... ")
-        all_initial_points = [np.array([130,30]),np.array([200,15]),np.array([310,50])]
+        # all_initial_points = [np.array([130,30]),np.array([200,15]),np.array([310,50])]
+        all_initial_points = [np.array([310,50])]
         shapes_dir = os.path.join(data_dir,"scale",object_list[class_nb])
         shapes_list = list(glob.glob(shapes_dir+"/*"))
         for myobject_nb in range(len(shapes_list)):
