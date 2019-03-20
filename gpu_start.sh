@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH --job-name RRd11
+#SBATCH --job-name resnet
 #SBATCH --array=0
 ### #SBATCH --reservation=IVUL
 #SBATCH --time=24:00:00
@@ -12,7 +12,7 @@ module load cudnn/7.0.3-cuda9.0.176
 source activate mytorch
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-DIR=/home/hamdiaj/semantic_robustness/
+DIR=/home/hamdiaj/semantic-robustness/
 cd $DIR
 
 echo $DIR
