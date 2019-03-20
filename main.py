@@ -60,7 +60,7 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         test_optimization(network_model,network_name,class_nb,object_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
     else :
         print("you asked for all points ... ")
-
+        all_initial_points = [np.array([130,30]),np.array([200,15]),np.array([310,50])]
         for myclass_nb in range(len(obj_class_list)): 
             shapes_dir = os.path.join(data_dir,"scale",object_list[myclass_nb])
             shapes_list = list(glob.glob(shapes_dir+"/*"))

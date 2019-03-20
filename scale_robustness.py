@@ -935,7 +935,7 @@ def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_
         exp_type_list = ["naive","OIR_B","OIR_W"]
     else :
         exp_type_list = ["naive","OIR_B",]
-    file = os.path.join(data_dir,"results","2d","optim_%s_%d_%d.pt" %(network_name,class_nb,object_nb))
+    file = os.path.join(data_dir,"checkpoint","optim_%s_%d_%d.pt" %(network_name,class_nb,object_nb))
     if not os.path.exists(file) or override:
         optim_dict = {}
         for exp in exp_type_list:
