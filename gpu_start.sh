@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name resnet
 #SBATCH --array=0
-### #SBATCH --reservation=IVUL
+#SBATCH --reservation=IVUL
 #SBATCH --time=24:00:00
 #SBATCH --gres=gpu:1
 #SBATCH -o logs/output.%a.%j.out
