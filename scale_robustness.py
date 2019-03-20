@@ -941,6 +941,7 @@ def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_
         exp_type_list = ["naive","OIR_B",]
     file = os.path.join(data_dir,"checkpoint","optim_%s_%d_%d.pt" %(network_name,class_nb,object_nb))
     if not os.path.exists(file) or override:
+        print("starting the expereimtn")
         optim_dict = {}
         for exp in exp_type_list:
             optim_dict[exp] = {}
