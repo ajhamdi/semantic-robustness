@@ -18,7 +18,7 @@ import numpy as np
 #         top_n_df = top_n_df.append(this_ft_df.reset_index(drop=True).iloc[:top_n])
 #     return top_n_df
 
-def main(network, all_points ,class_nb, object_nb , override, reduced):
+def main(network, all_points ,class_nb, object_nb , override, reduced, iterations):
     # with open(tags_filename, 'r') as fobj:
     #     tags = json.load(fobj)
     # print(bool(all_points),override,reduced)
@@ -40,7 +40,7 @@ def main(network, all_points ,class_nb, object_nb , override, reduced):
     # incept = nn.DataParallel(incept)
     models_dicts = {"ResNet50":resnet , "AlexNet": alexnet , "VGG":vgg , "Inceptionv3":incept}
     setup = {}
-    setup["learning_rate"]=0.1 ; setup["alpha"]=0.05 ; setup["beta"]=0.0009; setup["reg"]=0.1  ; setup["n_iterations"]=800
+    setup["learning_rate"]=0.1 ; setup["alpha"]=0.05 ; setup["beta"]=0.0009; setup["reg"]=0.1  ; setup["n_iterations"]=iterations
     # all_initial_points = [np.array([130,30]),np.array([200,15]),np.array([310,50])]
 
 
@@ -115,6 +115,8 @@ if __name__ == '__main__':
                       help='overriding existing dictionary files and writing the new ones')
     parser.add_argument('-d', '--reduced', default=0, type=int,
                       help='do not do all the experiments .. because it might fail at some.')
+    parser.add_argument('-i', '--iterations', default=800, type=int,
+                      help='number of iterations for the experiment')
 
 
 
