@@ -43,7 +43,7 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
     setup = {}
     setup["learning_rate"]=0.1 ; setup["alpha"]=0.05 ; setup["beta"]=0.0009; setup["reg"]=0.1  ; setup["n_iterations"]=iterations
     # all_initial_points = [np.array([130,30]),np.array([200,15]),np.array([310,50])]
-
+    special_list = [3,5,6,7,9]
     if network == "resnet":
         network_model =  models.resnet50(pretrained=True).eval().to(device)  ; network_name = "ResNet50" 
     elif network == "incept":
@@ -60,6 +60,8 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         all_initial_points = [np.array([310,50])]
         test_optimization(network_model,network_name,class_nb,object_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
     else :
+        if network == "alexnet":
+            class_nb = special_list[class_nb]
         print("you asked for all points ... ")
         all_initial_points = [np.array([130,30]),np.array([50,20]),np.array([200,15]),np.array([310,50])]
         shapes_dir = os.path.join(data_dir,"scale",object_list[class_nb])
@@ -67,7 +69,7 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         for myobject_nb in range(len(shapes_list)):
             test_optimization(network_model,network_name,class_nb,myobject_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
 
-
+# 1745621 inceptions
     # rows = []
     # for experiment_foldername in tqdm(glob.glob('{}/*/{}/*/*'.format(root, phase))):
     #     for events_filename in tqdm(glob.glob('{}/*/events*'.format(experiment_foldername))):
