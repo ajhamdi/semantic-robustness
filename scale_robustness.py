@@ -941,7 +941,7 @@ def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_
         exp_type_list = ["naive","OIR_B","OIR_W"]
     else :
         exp_type_list = ["naive","OIR_B",]
-    file = os.path.join(data_dir,"checkpoint",network_name,"optim_%d_%d.pt" %(class_nb,object_nb))
+    file = os.path.join(data_dir,"checkpoint",network_name,str(class_nb),str(object_nb),"optim.pt" )
     if not os.path.exists(file) or override:
         print("starting the expereimtn")
         optim_dict = {}
@@ -957,6 +957,9 @@ def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_
                 optimization_trace, loss_trace, result_region = optimize_n_boundary(f,f_grad,initial_point,learning_rate=learning_rate,alpha=alpha,beta=beta,reg=reg,n_iterations=n_iterations,exp_type=exp)
                 optim_dict[exp]["optim_trace"].append(optimization_trace) ; optim_dict[exp]["loss_trace"].append(loss_trace) ; optim_dict[exp]["regions"].append(result_region)
         #         optim_dict[exp]["optim_trace"] = optimization_trace ; optim_dict[exp]["loss_trace"] = loss_trace ; optim_dict[exp]["regions"] = result_region 
+        path,_ = os.path.split(file)
+        if not os.path.exists(path):
+            os.makedirs(path)
         torch.save(optim_dict, file)
     optim_dict = torch.load(file)
     return optim_dict
