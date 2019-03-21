@@ -145,10 +145,10 @@ class renderer_model_2(nn.Module):
         self.elevation.data.set_(torch.from_numpy(np.array(eval_point[1])).float().to(self.device))
         self.renderer.eye = nr.get_points_from_angles(self.camera_distance, self.elevation, self.azimuth)
         images = self.renderer(self.vertices, self.faces,self.textures)
-        print(type(images),len(images),images[0].size())
+        # print(type(images),len(images),images[0].size())
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
-        prop = torch.functional.F.softmax(self.network_model(images),dim=1)
+        prop = torch.functional.F.softmax(self.network_model(images[0]),dim=1)
         return prop
 class renderer_model(nn.Module):
     def __init__(self, network_model,vertices,faces,camera_distance,elevation,azimuth,image_size,device=None):
