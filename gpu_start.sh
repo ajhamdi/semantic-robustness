@@ -9,7 +9,7 @@
 #SBATCH --mem 70GB
 # module purge
 # module load cudnn/7.0.3-cuda9.0.176 
-source activate mytorch
+source activate mytensor
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 DIR=/home/hamdiaj/semantic-robustness/
