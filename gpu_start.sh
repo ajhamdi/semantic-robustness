@@ -7,8 +7,8 @@
 #SBATCH -o logs/output.%a.%j.out
 #SBATCH -e logs/output.%a.%j.err
 #SBATCH --mem 70GB
-# module purge
-# module load cudnn/7.0.3-cuda9.0.176 
+module purge
+module load el7.5/cuda/9.2.148.1
 source activate mytensor
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )

@@ -947,7 +947,7 @@ def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_
             optim_dict[exp] = {}
             optim_dict[exp]["optim_trace"] =[] ; optim_dict[exp]["loss_trace"] = [] ; optim_dict[exp]["regions"] = [] 
         optim_dict["initial_point"] = all_initial_points
-        optim_dict["class_nb"] = class_nb ; optim_dict["shape_id"] = shape_id ; optim_dict["network_name"] = network_name
+        optim_dict["class_nb"] = class_nb ; optim_dict["shape_id"] = shape_id ; optim_dict["network_name"] = network_name[]
     #     exp_type_list = ["inner","inner_outer_naive","inner_outer_grad","trap"]
         # network_prop_dicts["Inceptionv3"][class_n][int(initial_point/2)]
         for initial_point in all_initial_points:
