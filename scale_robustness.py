@@ -147,7 +147,7 @@ class renderer_model_2(nn.Module):
         images = self.renderer(self.vertices, self.faces,self.textures)
         # print(type(images),len(images),images[0].size())
         image = images[0].detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
-        imsave("./aa.png",(255*image).astype(np.uint8))
+        # imsave("./aa.png",(255*image).astype(np.uint8))
         prop = torch.functional.F.softmax(self.network_model(images[0]),dim=1)
         return prop
 class renderer_model(nn.Module):
@@ -185,7 +185,7 @@ class renderer_model(nn.Module):
         images = self.renderer(self.vertices, self.faces,self.textures)
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
-        prop = torch.functional.F.softmax(self.network_model(images),dim=1)
+        prop = torch.functional.F.softmax(self.network_model(images[0]),dim=1)
     
         return prop
 
