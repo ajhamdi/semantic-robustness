@@ -169,4 +169,4 @@
 
 
 ######## generate set of points 
-python main.py --network=resnet --all_points=0 --class_nb=1 --object_nb=1 --iterations=5 #--override=False --reduced=False
+python main.py --network=resnet --all_points=0 --class_nb=1 --object_nb=1 --iterations=5 --override=1 --reduced=0

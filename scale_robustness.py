@@ -159,6 +159,7 @@ class renderer_model(nn.Module):
         texture_size = 2
         textures = torch.ones(self.faces.shape[0], self.faces.shape[1], texture_size, texture_size, texture_size, 3, dtype=torch.float32)
         self.register_buffer('textures', textures)
+        self.device = device
 
         # define the DNN model as part of the model of the renderer 
         self.network_model =  network_model
@@ -178,7 +179,7 @@ class renderer_model(nn.Module):
         self.renderer = renderer
 
     def forward(self,azimuth):
-        self.azimuth.data.set_(torch.from_numpy(np.array(azimuth)).float().to(device))
+        self.azimuth.data.set_(torch.from_numpy(np.array(azimuth)).float().to(self.device))
         self.renderer.eye =nr.get_points_from_angles(self.camera_distance, self.elevation, self.azimuth)
         images = self.renderer(self.vertices, self.faces,self.textures)
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
@@ -316,7 +317,7 @@ def query_robustness(renderer,obj_class,querry_point):
 
 def query_gradient(renderer,obj_class,querry_point):
     prop = renderer(querry_point)
-    labels = torch.tensor([obj_class]).to(device)  #torch.from_numpy(np.tile(np.eye(1000)[obj_class],(1,prop.size()[0]))).float().to(device)
+    labels = torch.tensor([obj_class]).to(renderer.device)  #torch.from_numpy(np.tile(np.eye(1000)[obj_class],(1,prop.size()[0]))).float().to(device)
     criterion = nn.CrossEntropyLoss()
     loss = criterion(prop,labels)
     renderer.zero_grad()
@@ -325,7 +326,7 @@ def query_gradient(renderer,obj_class,querry_point):
 
 def query_gradient_2(renderer,obj_class,querry_point):
     prop = renderer(querry_point)
-    labels = torch.tensor([obj_class]).to(device)  #torch.from_numpy(np.tile(np.eye(1000)[obj_class],(1,prop.size()[0]))).float().to(device)
+    labels = torch.tensor([obj_class]).to(renderer.device)  #torch.from_numpy(np.tile(np.eye(1000)[obj_class],(1,prop.size()[0]))).float().to(device)
     criterion = nn.CrossEntropyLoss()
     loss = criterion(prop,labels)
     renderer.zero_grad()
@@ -952,7 +953,7 @@ def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_
         # network_prop_dicts["Inceptionv3"][class_n][int(initial_point/2)]
         for initial_point in all_initial_points:
             for exp in exp_type_list:
-                optimization_trace, loss_trace, result_region = optimize_n_boundary(f,f_grad,initial_point,learning_rate=0.1,alpha=0.05,beta=0.0009,reg=0.1,n_iterations=800,exp_type=exp)
+                optimization_trace, loss_trace, result_region = optimize_n_boundary(f,f_grad,initial_point,learning_rate=learning_rate,alpha=alpha,beta=beta,reg=reg,n_iterations=n_iterations,exp_type=exp)
                 optim_dict[exp]["optim_trace"].append(optimization_trace) ; optim_dict[exp]["loss_trace"].append(loss_trace) ; optim_dict[exp]["regions"].append(result_region)
         #         optim_dict[exp]["optim_trace"] = optimization_trace ; optim_dict[exp]["loss_trace"] = loss_trace ; optim_dict[exp]["regions"] = result_region 
         torch.save(optim_dict, file)

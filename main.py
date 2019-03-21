@@ -19,7 +19,7 @@ import numpy as np
 #     return top_n_df
 
 def main(network, all_points ,class_nb, object_nb , override, reduced, iterations):
-    print("HI")
+    print(network,all_points,class_nb, object_nb,override,reduced,iterations)
     # with open(tags_filename, 'r') as fobj:
     #     tags = json.load(fobj)
     # print(bool(all_points),override,reduced)
@@ -57,7 +57,6 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         raise Exception("NO NETWORK")
 
     if not all_points:
-        print("HI3333")
         all_initial_points = [np.array([310,50])]
         test_optimization(network_model,network_name,class_nb,object_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
     else :
