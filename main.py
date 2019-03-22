@@ -74,12 +74,12 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         all_initial_points = [np.array([130,30]),np.array([50,20]),np.array([200,15]),np.array([310,50])]
         shapes_dir = os.path.join(data_dir,"scale",object_list[class_nb])
         shapes_list = list(glob.glob(shapes_dir+"/*"))
-        if class_nb == 0 or class_nb == 3  :
-            custom_list_full = [5,6,7,8,9]
-        elif class_nb == 6 or class_nb == 7 :
-            custom_list_full = [8,9]
+        # if class_nb == 0 or class_nb == 3  :
+        #     custom_list_full = [5,6,7,8,9]
+        # elif class_nb == 6 or class_nb == 7 :
+        #     custom_list_full = [8,9]
         # for myobject_nb in range(len(shapes_list)):
-        myobject_nb = custom_list_full[custom_list]
+        myobject_nb = 4
         test_optimization(network_model,network_name,class_nb,myobject_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
 
 # 1745621 inceptions
