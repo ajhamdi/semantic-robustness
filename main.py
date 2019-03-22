@@ -139,9 +139,9 @@ if __name__ == '__main__':
                       help='do not do all the experiments .. because it might fail at some.')
     parser.add_argument('-i', '--iterations', default=800, type=int,
                       help='number of iterations for the experiment')
-    parser.add_argument('-i', '--custom_points', default=0, type=int,
-                      help='number of iterations for the experiment')
-    parser.add_argument('-i', '--custom_list', default=0, type=int,
+    parser.add_argument('-y', '--custom_points', default=0, type=int,
+                      help='is it custom point')
+    parser.add_argument('-k', '--custom_list', default=0, type=int,
                       help='number part of cutom list or index custom list')
 
 
