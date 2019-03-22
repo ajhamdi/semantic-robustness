@@ -80,6 +80,8 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         #     custom_list_full = [8,9]
         # for myobject_nb in range(len(shapes_list)):
         myobject_nb = 4
+        if network == "incept" and class_nb==9:
+            myobject_nb = 9
         test_optimization(network_model,network_name,class_nb,myobject_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
 
 # 1745621 inceptions
