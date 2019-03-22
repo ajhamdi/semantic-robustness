@@ -18,12 +18,12 @@ import numpy as np
 #         top_n_df = top_n_df.append(this_ft_df.reset_index(drop=True).iloc[:top_n])
 #     return top_n_df
 
-def main(network, all_points ,class_nb, object_nb , override, reduced, iterations):
+def main(network, all_points ,class_nb, object_nb , override, reduced, iterations,custom_points,custom_list):
     print(network,all_points,class_nb, object_nb,override,reduced,iterations)
     # with open(tags_filename, 'r') as fobj:
     #     tags = json.load(fobj)
     # print(bool(all_points),override,reduced)
-    all_points = bool(all_points) ; override = bool(override) ; reduced = bool(reduced)
+    all_points = bool(all_points) ; override = bool(override) ; reduced = bool(reduced) ; custom_points = bool(custom_points)
     data_dir = os.getcwd()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     if device.type  != "cuda":
@@ -59,7 +59,7 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
     if not all_points:
         all_initial_points = [np.array([310,50])]
         test_optimization(network_model,network_name,class_nb,object_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
-    else :
+    elif not custom_points :
         if network == "alexnet":
             class_nb = special_list[class_nb]
         print("you asked for all points ... ")
@@ -68,6 +68,19 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         shapes_list = list(glob.glob(shapes_dir+"/*"))
         for myobject_nb in range(len(shapes_list)):
             test_optimization(network_model,network_name,class_nb,myobject_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
+
+    else :
+        print("you asked for custom points ... ")
+        all_initial_points = [np.array([130,30]),np.array([50,20]),np.array([200,15]),np.array([310,50])]
+        shapes_dir = os.path.join(data_dir,"scale",object_list[class_nb])
+        shapes_list = list(glob.glob(shapes_dir+"/*"))
+        if class_nb == 0 or class_nb == 3  :
+            custom_list_full = [5,6,7,8,9]
+        elif class_nb == 6 or class_nb == 7 :
+            custom_list_full = [8,9]
+        # for myobject_nb in range(len(shapes_list)):
+        myobject_nb = custom_list_full[custom_list]
+        test_optimization(network_model,network_name,class_nb,myobject_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
 
 # 1745621 inceptions
     # rows = []
@@ -126,6 +139,10 @@ if __name__ == '__main__':
                       help='do not do all the experiments .. because it might fail at some.')
     parser.add_argument('-i', '--iterations', default=800, type=int,
                       help='number of iterations for the experiment')
+    parser.add_argument('-i', '--custom_points', default=0, type=int,
+                      help='number of iterations for the experiment')
+    parser.add_argument('-i', '--custom_list', default=0, type=int,
+                      help='number part of cutom list or index custom list')
 
 
 
