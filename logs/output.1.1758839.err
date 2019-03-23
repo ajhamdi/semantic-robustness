@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "main.py", line 143, in <module>
+    help='number of iterations for the experiment')
+  File "/home/hamdiaj/.conda/envs/mytensor/lib/python3.6/argparse.py", line 1352, in add_argument
+    return self._add_action(action)
+  File "/home/hamdiaj/.conda/envs/mytensor/lib/python3.6/argparse.py", line 1715, in _add_action
+    self._optionals._add_action(action)
+  File "/home/hamdiaj/.conda/envs/mytensor/lib/python3.6/argparse.py", line 1556, in _add_action
+    action = super(_ArgumentGroup, self)._add_action(action)
+  File "/home/hamdiaj/.conda/envs/mytensor/lib/python3.6/argparse.py", line 1366, in _add_action
+    self._check_conflict(action)
+  File "/home/hamdiaj/.conda/envs/mytensor/lib/python3.6/argparse.py", line 1505, in _check_conflict
+    conflict_handler(action, confl_optionals)
+  File "/home/hamdiaj/.conda/envs/mytensor/lib/python3.6/argparse.py", line 1514, in _handle_conflict_error
+    raise ArgumentError(action, message % conflict_string)
+argparse.ArgumentError: argument -i/--custom_points: conflicting option string: -i
