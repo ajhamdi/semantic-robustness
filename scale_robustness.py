@@ -967,7 +967,37 @@ def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_
 
 # In[488]:
 
+def map_network(network_model,network_name,class_nb,object_nb,obj_class_list,setup=None,data_dir=None,override=False,device="cuda:0"):
+    camera_distance = 2.732
+    azimuth = 50
+    domain_begin = 0 ; domain_end = 360 ; domain_precision = 5
+    analysis_domain = range(domain_begin, domain_end, domain_precision)
+    elevation = 35
+    image_size = 224
+    if setup:
+        a=setup["a"] ; b=setup["b"] ; precisions=setup["precisions"] 
+    else : 
+        a=[0,-10] ; b=[360,90] ; precisions=[3,3] 
+    shapes_dir = os.path.join(data_dir,"scale",object_list[class_nb])
+    shapes_list = list(glob.glob(shapes_dir+"/*"))
 
+#     object_nb = 1
+    mesh_file = os.path.join(shapes_list[object_nb],"models","model_normalized.obj")
+    mesh_file_list = [os.path.join(x,"models","model_normalized.obj") for x in shapes_list]
+    _,shape_id = os.path.split(shapes_list[object_nb])
+    vertices, faces =  load_mymesh(mesh_file)
+    renderer =  renderer_model_2(network_model,vertices,faces,camera_distance,elevation,azimuth,image_size).to(device)
+    f = lambda x:  query_robustness(renderer,obj_class_list[class_nb],x)
+    file = os.path.join(data_dir,"checkpoint",network_name,str(class_nb),str(object_nb),"map.pt" )
+    if not os.path.exists(file) or override:
+        z,xx,yy = evaluate_robustness_2(renderer,a,b,precisions,class_nb,obj_class_list)
+        map_dict = {"xx":xx , "yy":yy, "z":z ,"class_nb":class_nb,"shape_id":shape_id,"network_name":network_name}
+        path,_ = os.path.split(file)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        torch.save(map_dict, file)
+    map_dict = torch.load(file)
+    return map_dict
 
 
 # In[191]:
