@@ -967,7 +967,7 @@ def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_
 
 # In[488]:
 
-def map_network(network_model,network_name,class_nb,object_nb,obj_class_list,setup=None,data_dir=None,override=False,device="cuda:0"):
+def map_network(network_model,network_name,class_nb,object_nb,obj_class_list,object_list,setup=None,data_dir=None,override=False,device="cuda:0"):
     camera_distance = 2.732
     azimuth = 50
     domain_begin = 0 ; domain_end = 360 ; domain_precision = 5
@@ -986,7 +986,7 @@ def map_network(network_model,network_name,class_nb,object_nb,obj_class_list,set
     mesh_file_list = [os.path.join(x,"models","model_normalized.obj") for x in shapes_list]
     _,shape_id = os.path.split(shapes_list[object_nb])
     vertices, faces =  load_mymesh(mesh_file)
-    renderer =  renderer_model_2(network_model,vertices,faces,camera_distance,elevation,azimuth,image_size).to(device)
+    renderer =  renderer_model_2(network_model,vertices,faces,camera_distance,elevation,azimuth,image_size,device).to(device)
     f = lambda x:  query_robustness(renderer,obj_class_list[class_nb],x)
     file = os.path.join(data_dir,"checkpoint",network_name,str(class_nb),str(object_nb),"map.pt" )
     if not os.path.exists(file) or override:

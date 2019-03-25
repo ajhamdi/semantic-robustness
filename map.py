@@ -19,7 +19,7 @@ import numpy as np
 #     return top_n_df
 
 def main(all_shapes ,class_nb, object_nb , override, precisions,custom_shapes):
-    print(network,all_points,class_nb, object_nb,override,reduced,iterations)
+    print(all_shapes,class_nb, object_nb,override,precisions,custom_shapes)
     # with open(tags_filename, 'r') as fobj:
     #     tags = json.load(fobj)
     # print(bool(all_points),override,reduced)
@@ -62,18 +62,18 @@ def main(all_shapes ,class_nb, object_nb , override, precisions,custom_shapes):
             print("doing ...",k)
             for myobject_nb in range(len(shapes_list)):
                 print("doing shape ...",myobject_nb)
-                map_network(v,k,class_nb,myobject_nb,obj_class_list=obj_class_list,setup=setup,data_dir=data_dir,override=override,device=device)
+                map_network(v,k,class_nb,myobject_nb,obj_class_list=obj_class_list,object_list=object_list,setup=setup,data_dir=data_dir,override=override,device=device)
     elif custom_shapes:
         for k,v in models_dicts.items():
             print("doing ...",k)
             for myobject_nb in special_list :
                 print("doing shape ...",myobject_nb)
-                map_network(v,k,class_nb,myobject_nb,obj_class_list=obj_class_list,setup=setup,data_dir=data_dir,override=override,device=device)
+                map_network(v,k,class_nb,myobject_nb,obj_class_list=obj_class_list,object_list=object_list,setup=setup,data_dir=data_dir,override=override,device=device)
     else :
         for k,v in models_dicts.items():
             print("doing ...",k)
             print("doing shape ...",object_nb)
-            map_network(v,k,class_nb,object_nb,obj_class_list=obj_class_list,setup=setup,data_dir=data_dir,override=override,device=device)
+            map_network(v,k,class_nb,object_nb,obj_class_list=obj_class_list,object_list=object_list,setup=setup,data_dir=data_dir,override=override,device=device)
 
 
 

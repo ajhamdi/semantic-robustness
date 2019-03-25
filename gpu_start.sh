@@ -23,7 +23,7 @@ echo `hostname`
 
 # python main.py --network=resnet --all_points=1 --class_nb=${SLURM_ARRAY_TASK_ID} --object_nb=1 --iterations=600 --override=1 --reduced=0
 # python main.py --network=incept --all_points=1 --class_nb=9 --object_nb=1 --iterations=600 --override=1 --reduced=0 --custom_points=1 --custom_list=${SLURM_ARRAY_TASK_ID}
-python main.py --all_points=0 --class_nb=${SLURM_ARRAY_TASK_ID} --object_nb=0 --precisions=3 --override=1 --custom_shapes=0
+python map.py --all_shapes=0 --class_nb=${SLURM_ARRAY_TASK_ID} --object_nb=0 --precisions=3 --override=1 --custom_shapes=0
 
 
 
