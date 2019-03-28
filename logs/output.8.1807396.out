@@ -1,0 +1,48 @@
+/home/hamdiaj/semantic-robustness/
+/home/hamdiaj/semantic-robustness
+dgpu501-22
+1 8 0 1 3 0
+doing ... ResNet50
+doing shape ... 0
+doing shape ... 1
+doing shape ... 2
+doing shape ... 3
+doing shape ... 4
+doing shape ... 5
+doing shape ... 6
+doing shape ... 7
+doing shape ... 8
+doing shape ... 9
+doing ... AlexNet
+doing shape ... 0
+doing shape ... 1
+doing shape ... 2
+doing shape ... 3
+doing shape ... 4
+doing shape ... 5
+doing shape ... 6
+doing shape ... 7
+doing shape ... 8
+doing shape ... 9
+doing ... VGG
+doing shape ... 0
+doing shape ... 1
+doing shape ... 2
+doing shape ... 3
+doing shape ... 4
+doing shape ... 5
+doing shape ... 6
+doing shape ... 7
+doing shape ... 8
+doing shape ... 9
+doing ... Inceptionv3
+doing shape ... 0
+doing shape ... 1
+doing shape ... 2
+doing shape ... 3
+doing shape ... 4
+doing shape ... 5
+doing shape ... 6
+doing shape ... 7
+doing shape ... 8
+doing shape ... 9
