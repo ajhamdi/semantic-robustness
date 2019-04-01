@@ -756,8 +756,8 @@ def optimize_n_boundary(f,f_grad,initial_point,learning_rate=0.1,alpha=0.1,beta=
     if exp_type == "OIR_B" or exp_type == "OIR_W":
         M_C_c = (1+alpha)** (my_region.n -1 ) *( (1+0.5 * alpha)*my_region.mask_c + 0.5*alpha*my_region.mask ) 
         M_C = (1+alpha)** (my_region.n -1 ) *( (1+0.5 * alpha)*my_region.mask + 0.5*alpha*my_region.mask_c )     
-        M_D_c =  (2-my_region.n* beta)*my_region.mask_c - beta * my_region.mask
-        M_D = (2-my_region.n* beta)*my_region.mask - beta * my_region.mask_c
+        M_D_c =  (2-(2*my_region.n -1)* beta)*my_region.mask_c - beta * my_region.mask
+        M_D = (2-(2*my_region.n -1)* beta)*my_region.mask - beta * my_region.mask_c
         A = a - 0.5 * alpha * my_region.r ; B = b+ 0.5*alpha * my_region.r
         outer_region = n_interval(A,B)
     
@@ -792,6 +792,7 @@ def optimize_n_boundary(f,f_grad,initial_point,learning_rate=0.1,alpha=0.1,beta=
             A = a - 0.5 * alpha * my_region.r ; B = b+ 0.5*alpha * my_region.r
             outer_region(A,B)
             f_C =  np.expand_dims(np.array([f(x) for x in outer_region.corners_set]),axis=0).T
+            optimization_trace.append((a,b))
             loss = my_region.size_normalized()*((1+alpha)**my_region.n * np.sum(np.squeeze(f_C)) -2 * np.sum(np.squeeze(f_D))  )
             print("iteration: %3d,   current loss = %1.4f , boundaries: " %(t,loss), a ,b)
             loss_trace.append(loss)
@@ -815,6 +816,7 @@ def optimize_n_boundary(f,f_grad,initial_point,learning_rate=0.1,alpha=0.1,beta=
             A = a - 0.5 * alpha * my_region.r ; B = b+ 0.5*alpha * my_region.r
             outer_region(A,B)
             f_C =  np.expand_dims(np.array([f(x) for x in outer_region.corners_set]),axis=0).T
+            optimization_trace.append((a,b))
             loss = (1+alpha)**my_region.n * np.sum(np.squeeze(f_C))/(np.sum(np.squeeze(f_D)))  -1 
             print("iteration: %3d,   current loss = %1.4f , boundaries: " %(t,loss), a ,b)
             loss_trace.append(loss)
@@ -854,7 +856,7 @@ def optimize_n_boundary(f,f_grad,initial_point,learning_rate=0.1,alpha=0.1,beta=
 
     #     Update rule according to gradient descent and record the new loss 
 #         print(np.squeeze(a_grad))
-    return optimization_trace, loss_trace , my_region
+    return optimization_trace, loss_trace , my_region ###################### updated
 
 
 # ### running the optimization after initiailizaing the hyperparameters
