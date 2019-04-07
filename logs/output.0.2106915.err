@@ -1,0 +1,5 @@
+Unloading module for Anaconda
+Anaconda 4.4.0 is now unloaded
+Unloading module for GNU compilers
+GNU 6.4.0 is now unloaded
+slurmstepd: error: *** JOB 2106915 ON gpu504-37 CANCELLED AT 2019-04-04T23:05:33 DUE TO TIME LIMIT ***

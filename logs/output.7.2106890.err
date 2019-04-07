@@ -1,0 +1,10 @@
+Unloading module for Anaconda
+Anaconda 4.4.0 is now unloaded
+Unloading module for GNU compilers
+GNU 6.4.0 is now unloaded
+Traceback (most recent call last):
+  File "main.py", line 159, in <module>
+    main(**vars(args))
+  File "main.py", line 64, in main
+    class_nb = special_list[class_nb]
+IndexError: list index out of range
