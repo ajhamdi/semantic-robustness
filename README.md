@@ -48,7 +48,7 @@ Pytorch implementation of our method for ...... <br><br>
 </p>
 
 ## Prerequisites
-- Linux or macOS
+- Linux 
 - Python 2 or 3
 - NVIDIA GPU (11G memory or larger) + CUDA cuDNN
 
