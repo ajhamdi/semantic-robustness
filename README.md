@@ -54,15 +54,17 @@ Pytorch implementation of our method for ...... <br><br>
 
 ## Getting Started
 ### Installation
-- Install PyTorch and dependencies from http://pytorch.org
-- Install python libraries [dominate](https://github.com/Knio/dominate).
+- install [anaconda](https://docs.anaconda.com/anaconda/install/) and then run the following commans 
 ```bash
-pip install dominate
+conda env create -f environment.yaml
+source activate semantic
+conda install -c anaconda cudatoolkit==9.0
+pip install git+https://github.com/daniilidis-group/neural_renderer
 ```
 - Clone this repo:
 ```bash
-git clone https://github.com/NVIDIA/pix2pixHD
-cd pix2pixHD
+git clone https://github.com/ajhamdi/semantic-robustness
+cd semantic-robustness
 ```
 
 
