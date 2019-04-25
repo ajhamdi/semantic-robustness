@@ -6,7 +6,7 @@
 ### [Paper](https://arxiv.org/pdf/1904.04621.pdf) <br>
 Pytorch implementation of our method for ...... <br><br>
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
- [Abdullah Hamdi](www.fihm.ai)<sup>1</sup>, [Bernard Ghanem](http://www.bernardghanem.com/)
+ [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
  
 ## examples
 - Our label-to-streetview results
