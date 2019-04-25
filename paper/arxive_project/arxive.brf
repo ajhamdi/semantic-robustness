@@ -1,0 +1,67 @@
+\backcite {inception}{{1}{1}{section.1}}
+\backcite {inception}{{1}{1}{figure.caption.1}}
+\backcite {IMAGENET}{{1}{1}{section.1}}
+\backcite {unn-visual1,unn-visual3,unn-visual2}{{2}{1}{figure.caption.1}}
+\backcite {unn-robustness-noise1,unn-universal,unn-modar}{{2}{1}{figure.caption.1}}
+\backcite {unn-texture,unn-texture,unn-robustness-geometry}{{2}{1}{figure.caption.1}}
+\backcite {first-attack,fast-sign,carlini,projected-gradient}{{2}{1}{figure.caption.1}}
+\backcite {normal-light-attack,sada}{{2}{1}{figure.caption.1}}
+\backcite {bias}{{2}{1}{figure.caption.1}}
+\backcite {strike}{{2}{1}{figure.caption.1}}
+\backcite {sada}{{2}{1}{figure.caption.1}}
+\backcite {sada}{{2}{1}{figure.caption.1}}
+\backcite {unn-visual1,unn-visual2,unn-visual3}{{2}{2.1}{subsection.2.1}}
+\backcite {unn-robustness-noise1,unn-robustness-noise2,unn-robustness-noise3,unn-robustness-noise4,unn-robustness-noise5,unn-modar}{{2}{2.1}{subsection.2.1}}
+\backcite {info-lense}{{2}{2.1}{subsection.2.1}}
+\backcite {unn-texture}{{2}{2.1}{subsection.2.1}}
+\backcite {unn-robustness-geometry}{{2}{2.1}{subsection.2.1}}
+\backcite {unn-robustness-measure}{{2}{2.1}{subsection.2.1}}
+\backcite {first-attack}{{2}{2.2}{subsection.2.2}}
+\backcite {fast-sign,projected-gradient,deepfool,carlini}{{2}{2.2}{subsection.2.2}}
+\backcite {reduc-black,zeroth-order-attack}{{2}{2.2}{subsection.2.2}}
+\backcite {normal-light-attack}{{3}{2.2}{subsection.2.2}}
+\backcite {old-vision1,old-vision2}{{3}{2.2}{subsection.2.2}}
+\backcite {vig-nmr}{{3}{2.2}{subsection.2.2}}
+\backcite {paszke2017pytorch}{{3}{2.2}{subsection.2.2}}
+\backcite {sada}{{3}{2.2}{subsection.2.2}}
+\backcite {ioc}{{3}{2.3}{subsection.2.3}}
+\backcite {numerical}{{3}{2.3}{subsection.2.3}}
+\backcite {resnet}{{4}{3}{figure.caption.3}}
+\backcite {AlexNet}{{4}{\caption@xref {??}{ on input line 147}}{figure.caption.4}}
+\backcite {vgg}{{4}{\caption@xref {??}{ on input line 147}}{figure.caption.4}}
+\backcite {resnet}{{4}{\caption@xref {??}{ on input line 147}}{figure.caption.4}}
+\backcite {inception}{{4}{\caption@xref {??}{ on input line 147}}{figure.caption.4}}
+\backcite {sada}{{4}{3.1}{subsection.3.1}}
+\backcite {dinckl}{{5}{3.2}{equation.3.8}}
+\backcite {ioc}{{5}{3.2}{equation.3.9}}
+\backcite {sada,semantic-attack}{{7}{4.1}{subsection.4.1}}
+\backcite {shapenet}{{7}{4.1}{subsection.4.1}}
+\backcite {vig-nmr}{{7}{4.1}{subsection.4.1}}
+\backcite {resnet}{{7}{4.1}{subsection.4.1}}
+\backcite {vgg}{{7}{4.1}{subsection.4.1}}
+\backcite {AlexNet}{{7}{4.1}{subsection.4.1}}
+\backcite {inception}{{7}{4.1}{subsection.4.1}}
+\backcite {paszke2017pytorch}{{7}{4.1}{subsection.4.1}}
+\backcite {AlexNet}{{7}{\caption@xref {??}{ on input line 19}}{table.caption.7}}
+\backcite {vgg}{{7}{\caption@xref {??}{ on input line 20}}{table.caption.7}}
+\backcite {resnet}{{7}{\caption@xref {??}{ on input line 21}}{table.caption.7}}
+\backcite {inception}{{7}{\caption@xref {??}{ on input line 22}}{table.caption.7}}
+\backcite {paszke2017pytorch}{{7}{1}{table.caption.7}}
+\backcite {inception}{{8}{4.4}{equation.4.20}}
+\backcite {resnet}{{8}{4.4}{equation.4.20}}
+\backcite {IMAGENET}{{8}{4.4}{equation.4.20}}
+\backcite {fast-sign}{{8}{4.4}{equation.4.20}}
+\backcite {IMAGENET}{{8}{4.4}{equation.4.20}}
+\backcite {IMAGENET}{{8}{5}{figure.caption.9}}
+\backcite {IMAGENET}{{8}{5}{section.5}}
+\backcite {unn-modar,unn-robustness-noise1}{{8}{5}{section.5}}
+\backcite {think}{{9}{5}{section.5}}
+\backcite {IMAGENET}{{11}{A.5}{subsection.A.5}}
+\backcite {IMAGENET}{{21}{15}{figure.caption.20}}
+\backcite {IMAGENET}{{22}{16}{figure.caption.21}}
+\backcite {ioc}{{23}{B.1}{subsection.B.1}}
+\backcite {Boyd}{{23}{B.1}{theorem.B.1}}
+\backcite {dinckl}{{24}{B.3}{equation.B.36}}
+\backcite {numerical}{{28}{B.4}{subsection.B.4}}
+\backcite {sada,strike}{{30}{C.1}{subsection.C.1}}
+\backcite {shapenet}{{30}{C.3}{subsection.C.3}}

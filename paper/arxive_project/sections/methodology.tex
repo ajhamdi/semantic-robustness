@@ -1,0 +1,305 @@
+\section{Methodology} \label{sec:methodology}
+Typical adversarial pixel attacks involve a neural network agent $\mathbf{C}$ (\eg classifier or detector) that takes an image $\mathbf{x} \in [0,1]^{d}$ as input and outputs a multinoulli distribution over $K$ class labels with softmax values $[l_{1}, l_{2}, ... ,l_{K}]$, where $l_{j}$ is the softmax value for class $j$. The adversary (attacker) tries to produce a perturbed image $\mathbf{x'} \in [0,1]^{d}$ that is as close as possible to $\mathbf{x}$ , such that $\mathbf{C}$ changes its class prediction from $\mathbf{x}$ to $\mathbf{x'}$. %while maintaining a small distance $\mathit{d}(\mathbf{x},\mathbf{x'})< \epsilon$. 
+% The objective to be optimized can be formulated as follows: 
+% \begin{equation}
+% \begin{aligned} 
+%  &\min_{\mathbf{x'}} ~ \mathit{d}(\mathbf{x},\mathbf{x'})~~~ \text{s.t.~}  \mathbf{C}(\mathbf{x}) \ne \mathbf{C}(\mathbf{x'});~ \mathbf{x'} \in [0,1]^{d}
+% \label{eq:classifier-attack}
+% \end{aligned}
+% \end{equation}
+% where $\mathit{d}(\mathbf{x},\mathbf{x'})$ is the distance, %between the original image and the perturbed image
+% \eg $\|\mathbf{x} - \mathbf{x'} \|_{2}$ or $\|\mathbf{x} - \mathbf{x'} \|_{\infty}$. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+    In our case we consider a more general case where we are interested in the parameters $\mathbf{u} \in \Omega \subset \mathbb{R}^{n}$ , a hidden latent parameter that generate the image and is passes to scene generator (\eg a renderer function $\mathbf{R}$) that takes the parameter $\mathbf{u}$ and a an object shape $\mathbf{S}$ of a class that is identified by $\mathbf{C}$. $\Omega$ is the continuous semantic space for the parameters that we intend to study. The renderer creates the image $\mathbf{x} \in \mathbb{R}^{d}$, and then we study the behavior of a classifier $\mathbf{C}$ of that image across multiple shapes and multiple famous DNNs. Now, this function of interest is defined as follows 
+    \begin{equation}
+\begin{aligned} 
+ f(\mathbf{u}) = \mathbf{C}_{z}(\mathbf{R}(\mathbf{S}_{z},\mathbf{u})) ~, ~~ 0\leq  f(\mathbf{u}) \leq 1
+\label{eq:f}
+\end{aligned}
+\end{equation}
+where $z$ is class label of interest of study and we observe the network score for that class by rendering a shape $\mathbf{S}_{z}$ of the same class.The shape and class labels are constants and only the parameters varies for $f$ during analysis. 
+
+\subsection{Region Finding as an Operator} \label{sec:operator}
+We can visualize the function in \eqLabel{\ref{eq:f}} for any shape $\mathbf{S}_{z}$ as long as the DNN can identify the shape at some region in the semantic space $\Omega$ of interest, as we did in \figLabel{\ref{fig:intro_fig}}. However , plotting such figure is expensive and the complexity of plotting it increase exponentially with a big base. The complexity of plotting this type of semantic maps ( we call Network Semantic Map NSM) is $N$ for $n=1$, where $N$ is the number of samples needed for that dimension to be fully characterized. The complexity is $N^{2}$ for $n=2$, and we can see that for a general dimension $n$, the complexity of plotting the NMS to fill the semantic space $\Omega$ adequately is $N^{n}$. This number is huge even if we have only moderate dimensionality. Also note that we don't need to specify the whole $\Omega$ before finding the robust region around a point $\mathbf{u}$, which is an advantage of SADA \cite{sada}. As we will see in \secLabel{\ref{sec:application}}, this approach can be used to characterize the space much more efficiently as explained in \secLabel{\ref{sec:analysis}}, and we use it to measure robustness as in \secLabel{\ref{sec:application}}. Explicitly, we defined the region finding as an operator $\mathbf{\Phi}$ that takes the function of interest in \eqLabel{\ref{eq:f}} and initial point in the semantic space $\mathbf{u} \in \Omega $, and a shape $\mathbf{S}_{z}$ of some class $z$. The operator will return the hyper-rectangle $\mathbb{D} \subset \Omega $ where the DNN is robust in the region and doesn't drop the score of the intended class sharply as well as it keeps identifying the shape with label $z$ as illustrated in \figLabel{\ref{fig:NMS}}. The robust-region-finding operator is then defined as follows 
+\begin{equation}
+\begin{aligned} 
+& \mathbf{\Phi}_{\text{robust}}(f(\mathbf{u}),\mathbf{S}_{z},\mathbf{u}_{0}) = \mathbb{D} = \{\mathbf{u}: \mathbf{a} \leq \mathbf{u} \leq \mathbf{b}\} \\
+  \text{s.t.}&~~ \mathbb{E}_{\mathbf{u}\sim \mathbb{D}} [f(\mathbf{u})] \ge 1-\epsilon_{m}~, ~~ \mathbf{u}_{0} \in \mathbb{D} ~, ~ \text{VAR}[f(\mathbf{u})] \le \epsilon_{v}
+\label{eq:phi-rob}
+\end{aligned}
+\end{equation}
+where the left and right bounds of $\mathbb{D}$ are $\mathbf{a} = [a_{1},a_{2},...,a_{n}]$ and $\mathbf{b} = [b_{1},b_{2},...,b_{n}]$, respectively. The two samall thresholds $\epsilon_{m},\epsilon_{v}$ are to insure high performance and low variance of the DNN network in that robust region. We can define the opposite operator which is to find adversarial regions as:
+\begin{equation}
+\begin{aligned} 
+& \mathbf{\Phi}_{\text{adv}}(f(\mathbf{u}),\mathbf{S}_{z},\mathbf{u}_{0}) = \mathbb{D} = \{\mathbf{u}: \mathbf{a} \leq \mathbf{u} \leq \mathbf{b}\} \\
+ & \text{s.t.}~~ \mathbb{E}_{\mathbf{u}\sim \mathbb{D}} [f(\mathbf{u})] \leq \epsilon_{m}~, ~~ \mathbf{u}_{0} \in \mathbb{D} ~, ~ \text{VAR}[f(\mathbf{u})] \ge \epsilon_{v}
+\label{eq:phi-adv}
+\end{aligned}
+\end{equation}
+We can show clearly that $\mathbf{\Phi}_{\text{adv}}$ and $\mathbf{\Phi}_{\text{robust}}$ are related
+\begin{equation}
+\begin{aligned} 
+& \mathbf{\Phi}_{\text{adv}}(f(\mathbf{u}),\mathbf{S}_{z},\mathbf{u}_{0}) = \mathbf{\Phi}_{\text{robust}}(1-f(\mathbf{u}),\mathbf{S}_{z},\mathbf{u}_{0})
+\label{eq:phi-adv-robust}
+\end{aligned}
+\end{equation}
+So we can just focus our attentions on $\mathbf{\Phi}_{\text{robust}}$ to find robust regions , and the adversarial regions follows directly from \eqLabel{\ref{eq:phi-adv-robust}}. In all our methods, the region of interest $\mathbb{D} = \{\mathbf{u}: \mathbf{a} \leq \mathbf{u} \leq \mathbf{b}\}$, Here , we assume the size of the region is positive at every dimension , \ie $\mathbf{r} =  \mathbf{b} -  \mathbf{a} > \mathbf{0} $. The volume of the region $\mathbb{D}$ normalized by exponent of dimension $n$ is expressed as follows % $\text{volume}(\mathbb{D}) = \triangle = \frac{1}{2^{n}}\prod_{i=1}^{n}\mathbf{r}_{i} $
+\begin{equation}
+\begin{aligned} 
+\text{volume}(\mathbb{D}) = \triangle = \frac{1}{2^{n}}\prod_{i=1}^{n}\mathbf{r}_{i} 
+\label{eq:n-vol}
+\end{aligned}
+\end{equation}
+The region $\mathbb{D}$ can also be defined in terms of the matrix $\mathbf{D}$ of all the corner points $\{\mathbf{d}^{i}\}_{i=1}^{2^{n}}$ as follows.
+
+\begin{equation}
+\begin{aligned} 
+\text{corners}&(\mathbb{D}) = \mathbf{D}_{n\times 2^{n}} = \left[\mathbf{d}^{1} | \mathbf{d}^{2} |.. | \mathbf{d}^{2^{n}}\right] \\
+&\mathbf{D} = \mathbf{1}^{T}\mathbf{a}~ +~ \mathbf{M}^{T} \odot (\mathbf{1}^{T}\mathbf{r}) \\
+\mathbf{M}_{n\times 2^{n}} = &\left[ \mathbf{m}^{0}| \mathbf{m}^{1} |.. | \mathbf{m}^{2^{n}-1} \right] ~, ~ \text{where}~~ \mathbf{m}^{i} = \text{binary}_{n}(i)
+\label{eq:n-corners}
+\end{aligned}
+\end{equation}
+
+where $\mathbf{1}$ is the all-ones vector of size $2^{n}$, $\odot$ is the Hadamard product of matrices (element-wise) , and $\mathbf{M}$ is a constant  masking matrix defined as the matrix of binary numbers of n bits that range from 0 to $2{n} - 1 $
+% \begin{equation}
+% \begin{aligned} 
+% \mathbf{M}_{n\times 2^{n}} = \left[\mathbf{m}^{0} | \mathbf{m}^{1} |.. | \mathbf{m}^{2^{n}-1}\right] ~, ~ \text{where}~~ \mathbf{m}^{i} = \text{binary}_{n}(i)
+% \label{eq:n-mask}
+% \end{aligned}
+% \end{equation}
+\subsection{Deriving Update Directions}
+\mysection{Extending Naive to n-dimensions}
+% Extending the naive approach to n-diemsanions is straight forward using the trapezoidal rule. For $f: \mathbb{R}^{n} \rightarrow (0,1)$  , we define the following. Let the left bound vector be $\mathbf{a} = [a_{1},a_{2},...,a_{n}]$ and the right bound vector $\mathbf{b} = [b_{1},b_{2},...,b_{n}]$ define the n-dimensional hyper-rectangle region of interest. The region is then defined as follows :
+We start by defining the function vector $\mathbf{f}_{\mathbb{D}}$ of all function evaluations at all corner points of $\mathbb{D}$
+\begin{equation}
+\begin{aligned} 
+\mathbf{f}_{\mathbb{D}} &= \left[f(\mathbf{d}^{1}), f(\mathbf{d}^{2}),...,f(\mathbf{d}^{2^{n}}) \right]^{T} , ~ \mathbf{d^{i}} = \mathbf{D}_{:,i}
+\label{eq:n-function}
+\end{aligned}
+\end{equation}
+Then using Trapezoid approximation and Leibniz rule of calculus, the loss expression and the update directions.
+\begin{equation}
+\begin{aligned} 
+L(\mathbf{a},\mathbf{b}) &= - \idotsint_\mathbb{D} f(u_1,\dots,u_n) \,du_1 \dots du_n  + \frac{\lambda}{2} \left| \mathbf{r}\right|^{2}\\ 
+&\approx~ -\triangle\mathbf{1}^{T}\mathbf{f}_{\mathbb{D}} ~+~ \frac{\lambda}{2} \left| \mathbf{r}\right|^{2}\\ 
+\nabla_{\mathbf{a}}L  &\approx~ 2\triangle\text{diag}^{-1}(\mathbf{r}) \overline{\mathbf{M}}\mathbf{f}_{\mathbb{D}} + \lambda \mathbf{r}\\
+\nabla_{\mathbf{b}}L  &\approx~ -2\triangle\text{diag}^{-1}(\mathbf{r}) \mathbf{M}\mathbf{f}_{\mathbb{D}} - \lambda \mathbf{r}
+\label{eq:n-loss-update-naive}
+\end{aligned}
+\end{equation}
+We show all the derivations for n=1,n=2, and for general-n expression explicitly in the \supp.
+
+\mysection{Outer-Inner Ratio Loss (OIR)}
+We introduce an outer region $A,B$ with bigger area that contains the small region $(a,b)$. We follow the following assumption to insure that outer area is always positive $A =  a - \alpha \frac{b-a}{2} ,  B =  b + \alpha \frac{b-a}{2}$ , where $\alpha$ is the small boundary factor of the outer area to inner area.
+% \begin{equation}
+% \begin{aligned} 
+%  A =  a - \alpha \frac{b-a}{2} ,  B =  b + \alpha \frac{b-a}{2}  
+% \label{eq:fixed-assumption}
+% \end{aligned}
+% \end{equation}
+we formulate the problem as a ratio of outer over inner area and we try to make this ratio as close as possible to 0 . 
+$L =  \frac{\text{Area}_{\text{out}}}{\text{Area}_{\text{in}}}  $
+By using DencklBeck technique for solving non-linear fractional programming problems \cite{dinckl}. Using their formulation to transform $L$ as follows.
+\begin{equation}
+\begin{aligned} 
+L &= \frac{\text{Area}_{\text{out}}}{\text{Area}_{\text{in}}} ~ =~ \text{Area}_{\text{out}} ~-~ \lambda ~ \text{Area}_{\text{in}} \\
+&= \int_{A}^{B}f(a)du ~ -~ \int_{a}^{b}f(a)du ~ -~ \lambda ~\int_{a}^{b}f(a)du
+\label{eq:loss-oir}
+\end{aligned}
+\end{equation}
+where $\lambda^{*} = \frac{\text{Area}_{\text{out}}^{*}}{\text{Area}_{\text{in}}^{*}}$ is the DencklBeck factor and it is equal to the small objective best achieved.
+
+\mysection{Black-Box (OIR\_B)}
+Here we set $\lambda = 1$ to simplify the problem. This yields the following expression of the loss $L =  \text{Area}_{\text{out}} - \text{Area}_{\text{in}} =  \int_{A}^{B}f(u)du  - 2\int_{a}^{b}f(u)du$ which is similar to the area contrastive loss in \cite{ioc}. The update rules would be $\pd{L}{a} = -(1+ \frac{\alpha}{2})f(A) - \frac{\alpha}{2}f(B) + 2f(a) \\
+\pd{L}{b} = (1+ \frac{\alpha}{2})f(B) + \frac{\alpha}{2}f(A) - 2f(b)$
+% $L =  \text{Area}_{\text{out}} - \text{Area}_{\text{in}} = \int_{A}^{B}f(u)du  - 2\int_{a}^{b}f(u)du$
+% $L =  \text{Area}_{\text{out}} - \text{Area}_{\text{in}} = \int_{a - \alpha \frac{b-a}{2}}^{b + \alpha \frac{b-a}{2} }f(u)du  - 2\int_{a}^{b}f(u)du$
+% using Libeniz ruloe as in Lemma \ref{thm:integral}, we get the following update steps for the objective L :
+% \begin{equation}
+% \begin{aligned} 
+% \pd{L}{a} =& -(1+ \frac{\alpha}{2})f(A) - \frac{\alpha}{2}f(B) + 2f(a) \\
+% \pd{L}{b} =& (1+ \frac{\alpha}{2})f(B) + \frac{\alpha}{2}f(A) - 2f(b)
+% \label{eq:update-ioc-1}
+% \end{aligned}
+% \end{equation}
+
+% \mysection{Extension to n-dimension:}
+To extend to n-dimensions, we define an outer bigger region $\mathbb{Q}$ that include the smaller region $\mathbb{D} $ and defined as : $\mathbb{Q} = \{\mathbf{u}: \mathbf{a} - \frac{\alpha}{2}\mathbf{r} \leq \mathbf{u} \leq \mathbf{b} + \frac{\alpha}{2}\mathbf{r} \}$ , where $\mathbf{a},\mathbf{b},\mathbf{r}$ are defined as before, while $\alpha$ is defined as the boundary factor of the outer region in all the dimensions equivalently. The inner region $\mathbb{D}$ is defined as in \eqLabel{\ref{eq:n-corners}} and outer regions can also be defined in terms of the corner points as follows.
+\begin{equation}
+\begin{aligned} 
+% \text{corners}(\mathbb{D}) &= \mathbf{D}_{n\times 2^{n}} = \left[\mathbf{d}^{1} | \mathbf{d}^{2} |.. | \mathbf{d}^{2^{n}}\right] \\
+% \mathbf{D} &= \mathbf{1}^{T}\mathbf{a}~ +~ \mathbf{M}^{T} \odot (\mathbf{1}^{T}\mathbf{r}) \\
+\text{corners}(\mathbb{Q}) &= \mathbf{Q}_{n\times 2^{n}} = \left[\mathbf{q}^{1} | \mathbf{q}^{2} |.. | \mathbf{q}^{2^{n}}\right] \\
+\mathbf{Q} = \mathbf{1}^{T}(\mathbf{a}& - \frac{\alpha}{2}\mathbf{r})~ +~ (1+\alpha)\mathbf{M}^{T} \odot (\mathbf{1}^{T}\mathbf{r}) 
+\label{eq:n-corners2}
+\end{aligned}
+\end{equation}
+% where $\mathbf{1}$ is the all-ones vector of size $2^{n}$, $\odot$ is the Hadamard product of matrices (elemnt-wise) , and $\mathbf{M}$ is a constant  masking matrix defined in \eqLabel{\ref{eq:n-corners}}.
+Let $\mathbf{f}_{\mathbb{D}}$ be function vector as in \eqLabel{\ref{eq:n-function}} and $\mathbf{f}_{\mathbb{Q}}$ be another function vector evaluated at all possible outer corner points as follows.
+\begin{equation}
+\begin{aligned} 
+% \mathbf{f}_{\mathbb{D}} &= \left[f(\mathbf{d}^{1}), f(\mathbf{d}^{2}),...,f(\mathbf{d}^{2^{n}}) \right]^{T} , ~ \mathbf{d^{i}} = \mathbf{D}_{:,i}\\
+\mathbf{f}_{\mathbb{Q}} &= \left[f(\mathbf{q}^{1}), f(\mathbf{q}^{2}),...,f(\mathbf{q}^{2^{n}}) \right]^{T} , ~ \mathbf{q^{i}} = \mathbf{Q}_{:,i}
+\label{eq:n-function-outer}
+\end{aligned}
+\end{equation}
+Now the loss and update directions for the n-dimensional case becomes as follows .
+\begin{equation}
+\begin{aligned} 
+L(\mathbf{a},\mathbf{b}) &= \idotsint_\mathbb{Q} f(u_1,\dots,u_n) \,du_1 \dots du_n \\ 
+&- 2 \idotsint_\mathbb{D} f(u_1,\dots,u_n) \,du_1 \dots du_n \\ 
+&\approx \triangle\left((1+\alpha)^{n} \mathbf{1}^{T}\mathbf{f}_{\mathbb{Q}} ~-~ 2 ~ \mathbf{1}^{T}\mathbf{f}_{\mathbb{D}}\right)\\ 
+\nabla_{\mathbf{a}}L  \approx &2\triangle\text{diag}^{-1}(\mathbf{r}) \left(2\overline{\mathbf{M}}\mathbf{f}_{\mathbb{D}} ~-~ \overline{\mathbf{M}}_{\mathbb{Q}}\mathbf{f}_{\mathbb{Q}}  \right) \\
+\nabla_{\mathbf{b}}L  \approx &2\triangle\text{diag}^{-1}(\mathbf{r}) \left(-2\mathbf{M}\mathbf{f}_{\mathbb{D}} ~+~ \mathbf{M}_{\mathbb{Q}}\mathbf{f}_{\mathbb{Q}}  \right)
+\label{eq:n-loss-update-outer}
+\end{aligned}
+\end{equation}
+Where diag(.) is the diagonal matrix of the vector argument or the diagonal vector of the matrix argument. $\overline{\mathbf{M}}_{\mathbb{Q}}$ is the outer region constant matrix defined as follows. 
+\begin{equation}
+\begin{aligned} 
+\overline{\mathbf{M}}_{\mathbb{Q}} = &~  (1+\alpha)^{n-1}\left((1+\frac{\alpha}{2})\overline{\mathbf{M}}+\frac{\alpha}{2}\mathbf{M}\right)\\ 
+\mathbf{M}_{\mathbb{Q}} = &~  (1+\alpha)^{n-1}\left((1+\frac{\alpha}{2})\mathbf{M}+\frac{\alpha}{2}\overline{\mathbf{M}}\right)
+\label{eq:n-mask-outer}
+\end{aligned}
+\end{equation}
+\mysection{White-Box OIR (OIR\_W})
+ The following formulation is white-box in nature ( it need the gradient of the function $f $ in order to update the current estimates of the bound ) this is useful when the function in hand is differntiable ( \eg DNN ) , to obtain more intelligent regions  ,rather then the regions surrounded by near 0 values of the function $f$. We set $\lambda = \frac{\alpha}{\beta}$ in \eqLabel{\ref{eq:loss-oir}}, where $\alpha$ is the small boundary factor of the outer area, $\beta$ is the emphasis factor (we will show later how it determines the emphasis on the function vs the gradient). Hence, the objective in \eqLabel{\ref{eq:loss-oir}} becomes :
+\begin{equation}
+\begin{aligned} 
+&\argmin_{a,b} L = \argmin_{a,b}~ \text{Area}_{\text{out}} - \lambda ~ \text{Area}_{\text{in}} \\
+=& \argmin_{a,b}~ \int_{A}^{a}f(u)du + \int_{b}^{B}f(u)du - \frac{\alpha}{\beta} \int_{a}^{b}f(u)du \\
+=& \argmin_{a,b}~ \frac{\beta}{\alpha} \int_{a - \alpha \frac{b-a}{2}}^{b + \alpha \frac{b-a}{2} }f(u)du  - (1+\frac{\beta}{\alpha})\int_{a}^{b}f(u)du \\
+\pd{L}{a} &= \frac{\beta}{\alpha}\left(f(a) - f\left(a - \alpha \frac{b-a}{2}\right) \right) \\&~- \frac{\beta}{2}f\left(b + \alpha \frac{b-a}{2}\right) ~ - \frac{\beta}{2}f\left(a - \alpha \frac{b-a}{2}\right) + f(a) 
+\label{eq:loss-oir2}
+\end{aligned}
+\end{equation}
+% using Libeniz ruloe as in Lemma \ref{thm:integral}, we get the following derivatives of the bound $a$ :
+% \begin{equation}
+% \begin{aligned} 
+% \pd{L}{a} &= \frac{\beta}{\alpha}\left(f(a) - f\left(a - \alpha \frac{b-a}{2}\right) \right) \\&~- \frac{\beta}{2}f\left(b + \alpha \frac{b-a}{2}\right) ~ - \frac{\beta}{2}f\left(a - \alpha \frac{b-a}{2}\right) + f(a) 
+% \label{eq:update-oir-1}
+% \end{aligned}
+% \end{equation}
+now since $\lambda^{*}$ should be small for the optimal objective as $\lambda \rightarrow 0 ,~ \alpha \rightarrow 0$ and hence the derivative in \eqLabel{\ref{eq:loss-oir2}} becomes the following.  
+% \begin{equation}
+% \begin{aligned} 
+% \lim_{\alpha \to 0}\pd{L}{a} &= \lim_{\alpha \to 0} \beta\frac{\left(f(a) - f\left(a - \alpha \frac{b-a}{2}\right) \right)}{\alpha} \\&~- \frac{\beta}{2}f(b) ~- \frac{\beta}{2}f(a) + f(a) 
+% \label{eq:update-oir-2}
+% \end{aligned}
+% \end{equation}
+% We can see that the first term is proportional to the derivative of $f$ at $a$, and hence the expression becomes :
+\begin{equation}
+\begin{aligned} 
+\lim_{\alpha \to 0}\pd{L}{a} &= \frac{\beta}{2}\left((b-a)f^{\prime}(a) + f(b)\right) ~+~ (1-\frac{\beta}{2})f(a) \\
+\lim_{\alpha \to 0}\pd{L}{b} &= \frac{\beta}{2}\left((b-a)f^{\prime}(b) + f(a)\right) ~-~ (1-\frac{\beta}{2})f(b) 
+\label{eq:update-oir-3}
+\end{aligned}
+\end{equation}
+we can see that the update rule for $a$ and $b$ depends on the function value \textbf{and} the derivative of $f$ at the boundaries $a$ and $b$ respectively, with $\beta$ controlling the dependence.
+% \begin{equation}
+% \begin{aligned} 
+% \lim_{\alpha \to 0}\pd{L}{b} &= \frac{\beta}{2}\left((b-a)f^{\prime}(b) + f(a)\right) ~-~ (1-\frac{\beta}{2})f(b) 
+% \label{eq:update-oir-4}
+% \end{aligned}
+% \end{equation}
+If $\beta \rightarrow 0 $, the update directions in \eqLabel{\ref{eq:update-oir-3}} collapse to the unregularized naive update. To extend to n-dimensions, we have to define a term that involves the gradient of the function , which is the all-corners gradient matrix  $\mathbf{G}_{\mathbb{D}}$ .
+% \mysection{Etension to n-dimension}.
+% Following previous notations we have the following expressions for the loss and update directions for the bound. Similar to \eqLabel{\ref{eq:n-function}}, we define the gradient matrix $\mathbf{G}_{\mathbb{D}}$ as the matrix of all gradient vectors evaluated at all corner points of $\mathbb{D}$
+\begin{equation}
+\begin{aligned} 
+\mathbf{G}_{\mathbb{D}} &= \left[\nabla f(\mathbf{d}^{1})~|~\nabla f(\mathbf{d}^{2})~|~...~|~\nabla f(\mathbf{d}^{2^{n}}) \right]^{T} 
+\label{eq:n-gradient}
+\end{aligned}
+\end{equation}
+\begin{algorithm}[t] 
+\caption{Robust n-dimensional Region Finding for Black-Box DNNs by Outer-Inner Ratios}\label{alg: black}
+\small
+\SetAlgoLined
+  \textbf{Requires: } Semantic Function of a DNN $f(\mathbf{u})$ in \eqLabel{\ref{eq:f}}, initial semantic parameter $\mathbf{u}_{0}$, number of iterations T , learning rate $\eta$ , object shape $\mathbf{S}_{z}$ of class label $z$, boundary factor $\alpha$, Small $\epsilon$ \\
+   Form constant binary matrices $\mathbf{M}, \overline{\mathbf{M}},\mathbf{M}_{\mathbb{Q}},\overline{\mathbf{M}_{\mathbb{Q}}}, \mathbf{M}_{\mathbb{D}},\overline{\mathbf{M}_{\mathbb{D}}} $ \\
+   Initialize bounds $\mathbf{a}_{0}\leftarrow \mathbf{u}_{0} - \epsilon \mathbf{1} $, $\mathbf{b}_{0} \leftarrow \mathbf{u}_{0}+- \epsilon \mathbf{1}$ \\
+    $\mathbf{r}_{0} \leftarrow \mathbf{a}_{0}-\mathbf{b}_{0} $ , update region volume $ \triangle_{0} $ as in \eqLabel{\ref{eq:n-vol}}\\
+  \For{$t \leftarrow 1$ \KwTo $T$}{
+   form the all-corners function vectors ${f}_{\mathbb{D}},{f}_{\mathbb{Q}}$ as in \eqLabel{\ref{eq:n-function-outer}}\\
+    $\nabla_{\mathbf{a}}L  \leftarrow 2\triangle_{t-1}\text{diag}^{-1}(\mathbf{r}_{t-1}) \left(2\overline{\mathbf{M}}\mathbf{f}_{\mathbb{D}} ~-~ \overline{\mathbf{M}}_{\mathbb{Q}}\mathbf{f}_{\mathbb{Q}}  \right)$ \\
+$\nabla_{\mathbf{b}}L  \leftarrow 2\triangle_{t-1}\text{diag}^{-1}(\mathbf{r}_{t-1}) \left(-2\mathbf{M}\mathbf{f}_{\mathbb{D}} ~+~ \mathbf{M}_{\mathbb{Q}}\mathbf{f}_{\mathbb{Q}}  \right)$\\
+    update bounds: $\mathbf{a}_{t}\leftarrow \mathbf{a}_{t-1} - \eta \nabla_{\mathbf{a}}L$, $\mathbf{b}_{t}\leftarrow \mathbf{b}_{t-1} - \eta \nabla_{\mathbf{b}}L$ \\
+     $\mathbf{r}_{t} \leftarrow \mathbf{a}_{t}-\mathbf{b}_{t} $ , update region volume $ \triangle_{t} $ as in \eqLabel{\ref{eq:n-vol}}
+    }
+    \textbf{Returns: }robust region bounds: $ \mathbf{a}_{T},\mathbf{b}_{T}$ .
+\end{algorithm}
+
+\begin{algorithm}[h] 
+\caption{Robust n-dimensional Region Finding for White-Box DNNs by Outer-Inner Ratios}\label{alg: white}
+\small
+\SetAlgoLined
+  \textbf{Requires: }  Semantic Function of a DNN $f(\mathbf{u})$ in \eqLabel{\ref{eq:f}}, initial semantic parameter $\mathbf{u}_{0}$, , learning rate $\eta$ , object shape $\mathbf{S}_{z}$ of class label $z$, emphasis factor $\beta$, Small $\epsilon$ \\
+   Form constant binary matrices $\mathbf{M}, \overline{\mathbf{M}}, \mathbf{M}_{\mathbb{D}},\overline{\mathbf{M}_{\mathbb{D}}} $ \\
+   Initialize bounds $\mathbf{a}_{0}\leftarrow \mathbf{u}_{0} - \epsilon \mathbf{1} $, $\mathbf{b}_{0} \leftarrow \mathbf{u}_{0}+- \epsilon \mathbf{1}$ \\
+    $\mathbf{r}_{0} \leftarrow \mathbf{a}_{0}-\mathbf{b}_{0} $ , update region volume $ \triangle_{0} $ as in as in \eqLabel{\ref{eq:n-vol}}\\
+  \For{$t \leftarrow 1$ \KwTo $T$}{
+   form the all-corners function vector ${f}_{\mathbb{D}}$ as in \eqLabel{\ref{eq:n-function-outer}}\\
+   form the all-corners gradients matrix $\mathbf{G}_{\mathbb{D}}$ as in \eqLabel{\ref{eq:n-gradient}}\\ 
+   form the gradient selection vectors $\mathbf{s} ,\overline{\mathbf{s}}$ as in \eqLabel{\ref{eq:n-update-grad-selection}}
+   $\nabla_{\mathbf{a}}L \leftarrow  \triangle_{t-1} \left(\text{diag}^{-1}(\mathbf{r}_{t-1})\overline{\mathbf{M}}_{\mathbb{D}}\mathbf{f}_{\mathbb{D}} + \beta\text{diag}(\overline{\mathbf{M}}\mathbf{G}_{\mathbb{D}}+ \beta \overline{\mathbf{s}}  \right)$  \\
+$\nabla_{\mathbf{b}}L  \leftarrow  \triangle_{t-1} \left(- \text{diag}^{-1}(\mathbf{r}_{t-1})\mathbf{M}_{\mathbb{D}}\mathbf{f}_{\mathbb{D}} + \beta\text{diag}(\mathbf{M}\mathbf{G}_{\mathbb{D}})+ \beta \mathbf{s}  \right)$\\
+    update bounds: $\mathbf{a}_{t}\leftarrow \mathbf{a}_{t-1} - \eta \nabla_{\mathbf{a}}L$, $\mathbf{b}_{t}\leftarrow \mathbf{b}_{t-1} - \eta \nabla_{\mathbf{b}}L$ \\
+     $\mathbf{r}_{t} \leftarrow \mathbf{a}_{t}-\mathbf{b}_{t} $ , update region volume $ \triangle_{t} $ as in \eqLabel{\ref{eq:n-vol}}
+    }
+    \textbf{Returns: }robust region bounds: $ \mathbf{a}_{T},\mathbf{b}_{T}$ .
+\end{algorithm}
+Now, the loss and update directions are given as follows.
+\begin{equation}
+\begin{aligned} 
+L(\mathbf{a},\mathbf{b})  \approx&~~ \frac{(1+\alpha)^{n} \mathbf{1}^{T}\mathbf{f}_{\mathbb{Q}}}{\mathbf{1}^{T}\mathbf{f}_{\mathbb{D}}} ~-~ 1\\ 
+\nabla_{\mathbf{a}}L  \approx & ~\triangle  \left(\text{diag}^{-1}(\mathbf{r})\overline{\mathbf{M}}_{\mathbb{D}}\mathbf{f}_{\mathbb{D}} ~+~ \beta\text{diag}(\overline{\mathbf{M}}\mathbf{G}_{\mathbb{D}})~+ \beta \overline{\mathbf{s}}  \right)  \\
+\nabla_{\mathbf{b}}L  \approx & ~\triangle  \left(- \text{diag}^{-1}(\mathbf{r})\mathbf{M}_{\mathbb{D}}\mathbf{f}_{\mathbb{D}} ~+~ \beta\text{diag}(\mathbf{M}\mathbf{G}_{\mathbb{D}})~+ \beta \mathbf{s}  \right)
+\label{eq:n-loss-update-grad}
+\end{aligned}
+\end{equation}
+where the mask is the special mask 
+\begin{equation}
+\begin{aligned} 
+ \overline{\mathbf{M}}_{\mathbb{D}} =&~ \left( \gamma_n \overline{\mathbf{M}} ~-~\beta \mathbf{M}  \right) \\
+  \mathbf{M}_{\mathbb{D}} =&~ \left( \gamma_n \mathbf{M} ~-~\beta \overline{\mathbf{M}}  \right) \\
+  \gamma_n =&~ 2~-~\beta(2n-1) 
+\label{eq:n-mask-grad}
+\end{aligned}
+\end{equation}
+$\mathbf{s}$ is a weighted sum of the gradient from other dimensions ($i \neq k$) contributing to the update direction of dimension $k$, where $k \in \{1 , 2 ,...,n\}$.
+\begin{equation}
+\begin{aligned} 
+\mathbf{s}_{k} &= \frac{1}{\mathbf{r}_{k}}\sum_{i=1, i\neq k }^{n}\mathbf{r}_{i}( (\overline{\mathbf{M}}_{i,:} - \mathbf{M}_{i,:})\odot \overline{\mathbf{M}}_{k,:} ) \mathbf{G}_{:,i} \\
+\overline{\mathbf{s}}_{k} &= \frac{1}{\mathbf{r}_{k}}\sum_{i=1, i\neq k }^{n}\mathbf{r}_{i}( ( \mathbf{M}_{i,:} - \overline{\mathbf{M}}_{i,:} )\odot \mathbf{M}_{k,:} ) \mathbf{G}_{:,i}
+\label{eq:n-update-grad-selection}
+\end{aligned}
+\end{equation}
+The derivation of the 2-dimensional case and n-dimensional case of the OIR formulation is included in the \supp. We try to use the trapezoid approximation directly on the loss and then differentiate the approximation. We get  an expression that involves the derivative of the function, and we obtain an n-dimensional extension for it in the \supp.~ However, when applying to find the region it diverges ( probably due to large approximations error). Algorithms \ref{alg: black}, and \ref{alg: white} summarize the techniques.
+
+
+% where $\epsilon$ is a small threshold that is defined for each specific adversarial attack. Distribution $\mathbf{P}_{\boldsymbol{\mu'}}$ ensures both exploration and exploitation since it covers all failure cases of $\mathbf{A}$ and still results in successful attacks for all of its samples. Hence, we seek an adversary $\mathbf{G}$ that tries to learn $\mathbf{P}_{\boldsymbol{\mu'}}$, so it can be used to analyze the weaknesses of $\mathbf{A}$ comprehensively.
+% Unlike the common practice of finding individual adversarial examples (most often images), we address the attacks distribution-wise and in a compact semantic parameter space describing the environment.
+% We denote our analysis technique as Semantic Adversarial Diagnostic Attack (SADA): \emph{semantic} because of the nature of the parameters representing the environment and \emph{diagnostic} because a fooling distribution is sought. In \secLabel{\ref{Analysis}}, we highlight what such semantic attacks can reveal about the nature of the agents used in safety-critical tasks like object detection and self-driving. %\B{be concise}
+
+% For the adversary $\mathbf{G}$ to achieve this challenging goal, we propose to optimize the following objective:
+
+% \begin{equation}
+% \begin{aligned} 
+%  &\argmin_{\mathbf{G}} ~~ \mathbb{E}_{\boldsymbol{\mu}\sim \mathbf{G}} [\mathit{Q}(\mathbf{A},\mathbf{E}_{\boldsymbol{\mu}})]  \\
+% %  & \text{s.t.}~~\forall~\boldsymbol{\mu} :~ \mathit{Q}(\mathbf{A},\mathbf{E}_{\boldsymbol{\mu}}) \le \epsilon ~~ \text{and}~~ \boldsymbol{\mu} ~\in ~[\boldsymbol{\mu}_{\text{min}},\boldsymbol{\mu}_{\text{max}}]^{d}
+%   & \text{s.t.}~~\{\boldsymbol{\mu}: \boldsymbol{\mu} \sim \mathbf{G}\} =  \{\boldsymbol{\mu'}: \boldsymbol{\mu'} \sim \mathbf{P}_{\boldsymbol{\mu'}} \}
+% \label{eq:objective}
+% \end{aligned}
+% \end{equation}
+% %where $\mathbf{P}_{\boldsymbol{\mu'}}$ is defined in \eqLabel{\ref{eq:fool-distribution}}. 
+% Algorithm \ref{alg: attacks} describes a general setup for the adversary $\mathbf{G}$ to learn to generate fooling parameters. It also includes a mechanism for evaluating $\mathbf{G}$ after training it to attack agent $\mathbf{A}$ in the black box environment $\mathbf{E}_{\boldsymbol{\mu}}$ for $N$ iterations. An attack is considered a fooling attack, if parameter $\boldsymbol{\mu} $ sampled from $\mathbf{G}$ achieves an episode score $\mathit{Q}(\mathbf{A},\mathbf{E}_{\boldsymbol{\mu}})\le \epsilon$. Consequently, the Attack Fooling Rate (AFR) is  defined as the rate at which samples from $\mathbf{G}$ are fooling attacks. In addition to AFR, the algorithm returns the set $S_{\boldsymbol{\mu'}}$ of adversarial examples that can be used to diagnose the agent. The equality constraint in \eqLabel{\ref{eq:objective}} is very strict to include \textit{all} the fooling parameters $\boldsymbol{\mu'}$ in the learned fooling distribution. It acts as a perceptuality metric in our new generalized attack to prevent unrealistic attacks. However, since this is very difficult, we relax the equality constraint in \eqLabel{\ref{eq:objective}}. In the following section we propose to leverage DNNs and recent advances in generative models to learn an estimate of the distribution $\mathbf{P}_{\boldsymbol{\mu'}}$.
+
+
+
+
+
+
+

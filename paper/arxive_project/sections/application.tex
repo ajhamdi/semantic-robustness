@@ -1,0 +1,54 @@
+\section{Analysis} \label{sec:analysis}
+First, by observing the figures of the 1D plots (as in \figLabel{\ref{fig:global}}), we can see that we can have robust regions in which lie adversarial regions. These ``traps" are dangerous in ML since it is hard to identify (without NSM) and they can cause failure cases for some models. These traps can be either attributed to the model architecture and training and loss or can be attributed to the bias in the dataset from which the model was trained (\ie ImageNet \cite{IMAGENET}. In \secLabel{\ref{sec:data-bias}} we study the effect of data bias on these results. Here, we are interested more on the effect of the training, architecture, and any reason that might create a unique signature of the network on the 2D semantic map. One obvious reason is the trade-off between accuracy and robustness, which is well established in the field of pixel perturbation robustness \cite{unn-modar,unn-robustness-noise1}. 
+
+Note plotting NMS is extremely expensive even for a moderate dimensionality \eg $n=8$. To see this , for the plot in \figLabel{\ref{fig:intro_fig}} we use $N=180$ points in the range of $360$ degrees. If all the other dimensionality require the same number $N=180$ of samples for their individual range , the total joint  space requires $180^{n} = 180^{8} = 1.1 * 10^{18}$ samples, which is million times the number of stars in the universe. Evaluating the DNN for that many forward passes is impossible. Thus, we follow a different approach, a bottom-up one, where we start from one point in the semantic space $\mathbf{u}_{0}$ and we grow an n-dimensional hyper-rectangle around that point to find the robust ``neighborhood" of that point for this specific neural network. For example in \figLabel{\ref{fig:intro_fig}}, we have 3 robust regions , so we would expect $3^{8}= 6561$ regions if $n=8$, and we need about $2^{8} = 256$ samples to fill in all the regions (assuming the regions fill half the space), and $500*2^{n}= 128K$ samples to find the region around the point. So in total we only need $500*4^{n}*3^{n} = 8. *10^{8} \ll 1.1 * 10^{18}$ samples to characterize the space. This what motivates the use of region growing in this work. Table \ref{tbl:benchmarking} compares different analysis approaches for semantic robustness of DNNs.
+
+We can see that InceptionV3 is the most accurate network (Table \ref{tbl:benchmarking}), but it is less robust (Table \ref{tbl:benchmarking} and \figLabel{\ref{fig:NMS}}) and it jumps sharply between very confident regions to almost zero confidence. This behavior violates our condition for the robust semantic region as in \eqLabel{\ref{eq:phi-rob}}, and it is reflected on the qualitative and quantitative results. A possible explanation of this behaviour of disassociation between cognition and abstract geometric inception comes from Neuroscience. Recent research shows that human brain process geometry and other semantic aspects unconsciously, before using the conscious-mind to identify objects\cite{think}, which indicates primitive understanding can be disassociate from the identification task (\eg classification).
+
+
+
+\section{Conclusion}% and Future Work} \label{sec:conclusion}
+We analyse DNNs from a semantic lens and show how more confident networks tend to create adversarial semantic regions inside highly confident regions. We developed a bottom-up approach to analyse the networks semantically by growing adversarial regions, which scales well with dimensionality and we use it to benchmark the semantic robustness of DNNs. We aim to investigate how to use the insights we gain from this work to develop and train semantically robust networks from the start while maintaining the accuracy. Another direct extension of our work is to develop large scale semantic robustness challenge where we label these robust/adversarial regions in the semantic space and release some of them to allow for training and then we test the trained models on hidden test set to measure robustness while reporting the accuracy on ImageNet validation set to make sure that the features of the model did not get affected by the robust training.
+
+
+%We found that Inception behave very confidently which make it less robust in the SRVR metric and when we visualize the Network Semantic Map. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% \M{
+% % What is the effect of shape ( voxalization , marching cube , fully detailed textured  ) on the performance of all of these classifiers/detectors 
+
+% % Use analytical graphs of varyeng some hyperparam and seeing the performance change across different classifers mechanisms 
+
+% % What is the main validation metric (scrutinized ) and what is the extra-outside assurance metric ( u never use it untill the end ) .
+
+% % }
+% % \M{
+
+% % Link to papers that show humans do that  ,we understand the semantics before undrestanding the scene (system 1 ) . some parts of our brain process geometry different than our prefrontal cortex
+
+% uncertainity from model vs uncertainity from data 
+
+% % ** what is robustness , which classifiers (detectors) is more robust , why ? .
+
+% %  derive a visual/numerical way to analyse detectors and compare all detectors …(  the graph: param vs performance if independent .. or factor using PGM and visualize joint ) 
+%  }

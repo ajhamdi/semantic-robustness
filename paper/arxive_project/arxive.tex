@@ -1,0 +1,111 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{iccv}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{lipsum}
+\usepackage{etoolbox}
+\usepackage{subfig}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[ruled]{algorithm2e}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{siunitx}
+\usepackage{pifont}
+\usepackage{booktabs}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\usepackage{bbm}
+% Include other packages here, before hyperref.
+
+% If you comment hyperref and then uncomment it, you should delete
+% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
+% run, let it finish, and you should be clear).
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+% \cvprfinalcopy % *** Uncomment this line for the final submission
+\definecolor{green}{RGB}{0,150,10}
+\newcommand{\todo}[1]{{\bf \color{orange}[todo: #1]}}
+\newcommand{\A}[1]{{\bf \color{ForestGreen}[A: #1]}}
+\newcommand{\B}[1]{{\bf \color{red}[BG: #1]}}
+\newcommand{\M}[1]{{\bf \color{blue}[M: #1]}}
+\newcommand{\remark}[1]{{\color{yellow}#1}}
+\newcommand*{\pd}[3][]{\ensuremath{\frac{\partial^{#1} #2}{\partial #3}}}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+
+\newcommand{\figLabel}{Figure~}
+\newcommand{\eqLabel}[1]{{Eq (#1)}}
+\newcommand{\secLabel}{Section~}
+\newcommand{\tblLabel}{Table~}
+\newcommand\tab[1][0.9cm]{\hspace*{#1}}
+\newcommand{\mysection}[1]{\vspace{3pt}\noindent\textbf{#1.}}
+\newcommand{\supp}{\textbf{Appendix}}
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\iccvfinalcopy % *** Uncomment this line for the final submission
+
+\def\iccvPaperID{152} % *** Enter the ICCV Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+\ificcvfinal\pagestyle{empty}\fi
+\begin{document}
+
+%%%%%%%%% TITLE
+\title{Towards Analyzing Semantic Robustness of Deep Neural Networks}
+
+\author{Abdullah Hamdi, Bernard Ghanem\\
+King Abdullah University of Science and Technology (KAUST), Thuwal, Saudi Arabia\\
+{\tt\small \{abdullah.hamdi, Bernard.Ghanem\} @kaust.edu.sa}
+% {\tt\small firstauthor@i1.org}
+% For a paper whose authors are all at the same institution,
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'',
+% just like the second author.
+% To save space, use either the email address or home page, not both
+% \and
+% Second Author\\
+% Institution2\\
+% First line of institution2 address\\
+% {\tt\small secondauthor@i2.org}
+}
+
+\maketitle
+%\thispagestyle{empty}
+
+
+%%%%%%%%% ABSTRACT
+\begin{abstract}
+Despite the impressive performance of Deep Neural Networks (DNNs) on various vision tasks, they still exhibit erroneous high sensitivity toward semantic primitives (\eg object pose). We propose a theoretically grounded analysis for DNNs robustness in the semantic space. We qualitatively analyze different DNNs semantic robustness by visualizing the DNN global behavior as semantic maps and observe interesting behavior of some DNNs. Since generating these semantic maps does not scale well with the dimensionality of the semantic space, we develop a bottom-up approach to detect robust regions of DNNs. To achieve this, We formalize the problem of finding robust semantic regions of the network as optimization of integral bounds and develop expressions for update directions of the region bounds. We use our developed formulations to quantitatively evaluate the semantic robustness of different famous network architectures. We show through extensive experimentation that several networks, though trained on the same dataset and while enjoying comparable accuracy, they do not necessarily perform similarly in semantic robustness. For example, InceptionV3 is more accurate despite being less semantically robust than ResNet50. We hope that this tool will serve as the first milestone towards understanding the semantic robustness of DNNs.
+\end{abstract}
+
+%%%%%%%%% BODY TEXT
+%%%%%%%%% BODY TEXT
+\input{sections/introduction.tex}
+\input{sections/related.tex}
+\input{sections/methodology.tex}
+\input{sections/experiments.tex}
+\input{sections/application.tex}
+
+
+
+% \clearpage
+
+{\small
+\bibliographystyle{ieee}
+\bibliography{egbib}
+}
+\input{sections/appendix.tex}
+\end{document}
