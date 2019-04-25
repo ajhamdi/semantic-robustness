@@ -1,4 +1,7 @@
 # supporting functions
+import os
+import sys
+import glob
 import imageio
 import numpy as np
 import logging
@@ -8,6 +11,13 @@ import matplotlib.patches as patches
 from IPython.display import display, HTML 
 import trimesh
 import matplotlib.pyplot as plt
+
+def int2zero_string(myint,max_int=99):
+    """
+    returns a string filled with zeros for the given int according to the max int given to fill just enough
+    """
+    return str(myint).zfill(len(str(max_int)))
+
 def make_gif(filename):
     with imageio.get_writer(filename, mode='I') as writer:
         for filename in sorted(glob.glob('/tmp/_tmp_*.png')):
@@ -16,11 +26,19 @@ def make_gif(filename):
     writer.close()
 
 
-def gif_folder(data_dir, extension="jpg"):
+def gif_folder(data_dir, extension="jpg",duration=None):
     image_collection = []
-    for img_name in glob.glob(data_dir + "/*." + extension):
+    for img_name in sorted(glob.glob(data_dir + "/*." + extension)):
         image_collection.append(imageio.imread(img_name))
-    imageio.mimsave(os.path.join(data_dir, "video.gif"), image_collection)
+    if not duration:
+        imageio.mimsave(os.path.join(data_dir, "video.gif"), image_collection)
+    else:
+        imageio.mimsave(os.path.join(data_dir, "video.gif"), image_collection, duration=duration)
+
+def check_folder(data_dir):
+    if not os.path.exists(data_dir):
+        os.mkdir(data_dir)
+
 
 def int2binarray(number, n_bits ): 
     if 2**n_bits <= number :
@@ -218,8 +236,10 @@ def visualize_network_2(map_dict,object_list,optim_dict=None,data_dir=None,heatm
     if data_dir:
         if optim_dict:
             plt.savefig(os.path.join(data_dir,"results","2d","optim","%s_%s_%d_regions.pdf" %(network, object_list[class_nb],object_nb )),bbox_inches='tight')
+            plt.close()
         else:
             plt.savefig(os.path.join(data_dir,"results","2d","%s_%s_%d.pdf" %(network, object_list[class_nb],object_nb )),bbox_inches='tight')
+            plt.close()
             
 def visualize_network_2_avg(map_dict_list,object_list,optim_dict=None,data_dir=None,heatmap=True):
     """
@@ -247,6 +267,7 @@ def visualize_network_2_avg(map_dict_list,object_list,optim_dict=None,data_dir=N
     plt.ylim(np.min(yy.reshape(-1)),np.max(yy.reshape(-1)))    
     if data_dir:
         plt.savefig(os.path.join(data_dir,"results","2d","%s_%s_%s.pdf" %(network, object_list[class_nb],"Average" )),bbox_inches='tight')
+        plt.close()
 
 def visualize_network_2_avg_avg(all_networks_list,object_list,optim_dict=None,data_dir=None,heatmap=True):
     """
@@ -333,7 +354,7 @@ def visualize_network_1(map_dict,object_list,optim_dict=None,data_dir=None,heatm
         else:
             plt.savefig(os.path.join(data_dir,"results","1d","%s_%s_%d.pdf" %(network, object_list[class_nb],object_nb )),bbox_inches='tight')
 
-def visulize_trace(optimization_traces,loss_traces,object_list,point_nb=0,exp_type=None,show_loss=True):
+def visulize_trace(optimization_traces,loss_traces,class_nb,object_list,object_nb,point_nb=0,data_dir=None,exp_type=None,show_loss=True):
     """
     visualize the trace taken by the optimization on the two variables (a,b) contained in the list optimization_trace
     
@@ -361,23 +382,22 @@ def visulize_trace(optimization_traces,loss_traces,object_list,point_nb=0,exp_ty
         ax2.tick_params(axis='y', labelcolor=color)
     plt.savefig(os.path.join(data_dir,"results","1d","run%d_%d_%d_%s.pdf" %(point_nb,class_nb,object_nb,exp_type )))
 
-def visulize_region_growing_1(optimization_traces,map_dict,object_list,initial_points=[],point_nb=0,data_dir=None,exp_type=None):
+def visulize_region_growing_1(optim_dict,map_dict,object_list,point_nb=0,data_dir=None):
     """
     save jpgs of the 1D regions while growing   
     
     """
-    point_nb = 0
+    network = map_dict["network_name"]
+    initial_points = optim_dict["initial_point"] 
     initial_point = initial_points[point_nb]
-    optimization_trace = optimization_traces[point_nb]
-    t = np.array(range(len(optimization_trace)))
-    for ii,bound in enumerate(optimization_trace) :
-        a,b = bound ; r = b-a
+    nb_iterations = len(optim_dict["naive"]["optim_trace"][point_nb]) 
+    class_nb = map_dict["class_nb"] ; y = map_dict["y"] ; x= map_dict["x"]  ; object_nb = map_dict["object_nb"]
+    for ii in range(nb_iterations) :
         plt.figure(figsize = (9, 6))
         fig,ax = plt.subplots(1)
         plt.title("%s softmax scores of %s class" %(network,object_list[class_nb].upper()),fontsize=15)
         plt.xlabel("Azimuth rotation around the object(degrees)",fontsize=13)
         plt.ylabel("%s softmax scores" %(network),fontsize=13)
-        class_nb = optim_dict["class_nb"] ; y = map_dict["y"] ; x= map_dict["x"] 
         plt.plot(x,y,linewidth=1.5,alpha=1)
         plt.xlim(0,360)
         plt.ylim(0,1)    
@@ -388,6 +408,7 @@ def visulize_region_growing_1(optimization_traces,map_dict,object_list,initial_p
         for exp,proprts in optim_dict.items():
             if exp != "naive" and exp != "OIR_B" and exp != "OIR_W":
                 continue
+            a,b = optim_dict[exp]["optim_trace"][point_nb][ii] ; r = b-a
             rectangles = [(a,0,r,1)]
             rect = patches.Rectangle((rectangles[0][0],rectangles[0][1]),rectangles[0][2],rectangles[0][3],linewidth=1,edgecolor=colors_dict[exp],facecolor='none',label=exp.replace("_"," "))
             ar = ax.add_patch(rect)
@@ -397,5 +418,9 @@ def visulize_region_growing_1(optimization_traces,map_dict,object_list,initial_p
                 rect = patches.Rectangle((rectangle[0],rectangle[1]),rectangle[2],rectangle[3],linewidth=1,edgecolor=colors_dict[exp],facecolor='none',label=exp.replace("_"," "))
                 ax.add_patch(rect)
         ax.legend(artist_list ,label_list,fontsize=8)
-        plt.savefig(os.path.join(data_dir,"examples","1d","%d.jpg" %(ii)))
+        data_path = os.path.join(data_dir,"examples","optimization","1d","%d_%d_%d" %(point_nb,class_nb,object_nb))
+        check_folder(data_path)
+        plt.savefig(os.path.join(data_path,"%s.jpg" %(int2zero_string(ii,max_int=nb_iterations))))
+        plt.close()
+    gif_folder(data_path,duration=0.01)
    

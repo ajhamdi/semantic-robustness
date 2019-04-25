@@ -7,16 +7,9 @@ import json
 from scale_robustness import *
 import glob
 # from tqdm import tqdm
-from collections import OrderedDict
 import numpy as np
 
-# def filter_top_n(df, tags, top_n):
-#     top_n_df = pd.DataFrame()
-#     df_by_exp_types = df.groupby(by=['exp_type'])
-#     for ft, this_ft_df in df_by_exp_types:
-#         this_ft_df.sort_values(by=tags, ascending=False, inplace=True)
-#         top_n_df = top_n_df.append(this_ft_df.reset_index(drop=True).iloc[:top_n])
-#     return top_n_df
+
 
 def main(network, all_points ,class_nb, object_nb , override, reduced, iterations,custom_points,custom_list):
     print(network,all_points,class_nb, object_nb,override,reduced,iterations)
@@ -30,15 +23,6 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         print("Warninign ....... no Cuda !!")
     object_list =  ['aeroplane',"bathtub",'bench', 'bottle','chair',"cup","piano",'rifle','vase',"toilet"] #["teapot","truck","boat","tv"]
     obj_class_list = [404,435,703,898,559,968,579,413,883,861] # [849,586,606,549] 
-    #### define the deep model 
-    # resnet = models.resnet50(pretrained=True).eval().to(device)
-    # # resnet = nn.DataParallel(resnet)
-    # alexnet = models.alexnet(pretrained=True).eval().to(device)
-    # # alexnet = nn.DataParallel(alexnet)
-    # vgg = models.vgg11_bn(pretrained=True).eval().to(device)
-    # # vgg = nn.DataParallel(vgg)
-    # incept = models.inception_v3(pretrained=True).eval().to(device)
-    # # incept = nn.DataParallel(incept)
     # models_dicts = {"ResNet50":resnet , "AlexNet": alexnet , "VGG":vgg , "Inceptionv3":incept}
     setup = {}
     setup["learning_rate"]=0.1 ; setup["alpha"]=0.05 ; setup["beta"]=0.0009; setup["reg"]=0.1  ; setup["n_iterations"]=iterations
