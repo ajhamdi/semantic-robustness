@@ -93,11 +93,10 @@ python train.py --name label2city_512p
 - To view training results, please checkout intermediate results in `./checkpoints/label2city_512p/web/index.html`.
 If you have tensorflow installed, you can see tensorboard logs in `./checkpoints/label2city_512p/logs` by adding `--tf_log` to the training scripts.
 
-### Multi-GPU training
-- Train a model using multiple GPUs (`bash ./scripts/train_512p_multigpu.sh`):
+### Cluster testing 
+- Test the models on the cluster of GPUs ( if you have access to one ) 
 ```bash
-#!./scripts/train_512p_multigpu.sh
-python train.py --name label2city_512p --batchSize 8 --gpu_ids 0,1,2,3,4,5,6,7
+bash gpu_start.sh
 ```
 Note: this is not tested and we trained our model using single GPU only. Please use at your own discretion.
 
