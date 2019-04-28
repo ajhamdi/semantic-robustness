@@ -1,8 +1,8 @@
 <img src='.//results/teapot.jpg' align="right" width=500>
-<img src='./some_examples/robustness_out.gif' align="left" width=130>  
+<img src='./some_examples/robustness_out.gif' align="left" width=200>  
 <br><br><br><br>
 
-# semantic-robustness
+# Semantic Robustness of Deep Neural Networks
 ### [Paper](https://arxiv.org/pdf/1904.04621.pdf) | [Tutorial](https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn)<br>
 Pytorch implementation of our method for ...... <br><br>
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
