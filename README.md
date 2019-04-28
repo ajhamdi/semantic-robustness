@@ -44,9 +44,8 @@ More example scripts can be found in the `scripts` directory.
 
 
 ### Dataset
-- We use the Cityscapes dataset. To train a model on the full dataset, please download it from the [official website](https://www.cityscapes-dataset.com/) (registration required).
-After downloading, please put it under the `datasets` folder in the same way the example images are provided.
-
+- We collect 100 3D shapes from 10 classes from [ShapeNet](https://www.shapenet.org/) that are also exist in [ImagNet](http://www.image-net.org/) and made sure that networks trained on ImageNEt identifies these shapes of ShapeNet nefore proceeding. All the obj files are availabe in the `sacel` folder which contain the dataset. The following are visuailzations of the 3D dataset used in our paper. 
+<img src='./some_examples/robustness_out.gif' width=180>  
 
 ### Training
 - Train a model at 1024 x 512 resolution (`bash ./scripts/train_512p.sh`):
