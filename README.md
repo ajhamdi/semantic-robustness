@@ -11,11 +11,13 @@ Pytorch implementation of our method for ...... <br><br>
 ## Examples of Results
 - ### visualizing the Deep networks average semantic profiles for 10 objects.
 <img src='.//results/toilet.jpg' align="center" width=500>
+
 - ### visualizing the Deep networks semantic profiles for average  objects.
 <img src='.//results/toilet.jpg' align="center" width=500>
+
 - ### visualizing the Deep networks semantic profiles for average  objects.
 <img src='.//results/toilet.jpg' align="center" width=500>
-- ### 
+
 
 
 ## Prerequisites
