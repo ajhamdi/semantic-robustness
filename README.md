@@ -1,4 +1,4 @@
-<img src='imgs/teaser_720.gif' align="right" width=360>
+<img src='semantic-robustness/some_examples/robustness_out.gif' align="right" width=360>
 
 <br><br><br><br>
 
