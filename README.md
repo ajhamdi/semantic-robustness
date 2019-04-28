@@ -8,8 +8,14 @@ Pytorch implementation of our method for ...... <br><br>
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
  [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
 
-## examples
-- ### visualizing the Deep networks profiles for some objects in the 
+## Examples of Results
+- ### visualizing the Deep networks average semantic profiles for 10 objects.
+<img src='.//results/toilet.jpg' align="center" width=500>
+- ### visualizing the Deep networks semantic profiles for average  objects.
+<img src='.//results/toilet.jpg' align="center" width=500>
+- ### visualizing the Deep networks semantic profiles for average  objects.
+<img src='.//results/toilet.jpg' align="center" width=500>
+- ### 
 
 
 ## Prerequisites
@@ -33,9 +39,9 @@ cd semantic-robustness
 ```
 
 
-### Testing
-- A few example Cityscapes test images are included in the `datasets` folder.
-- Please download the pre-trained Cityscapes model from [here](https://drive.google.com/file/d/1h9SykUnuZul7J3Nbms2QGH1wa85nbN2-/view?usp=sharing) (google drive link), and put it under `./checkpoints/label2city_1024p/`
+### Simple Tutorial:
+- We provide a simple tutorial 
+Please download the pre-trained Cityscapes model from [here](https://drive.google.com/file/d/1h9SykUnuZul7J3Nbms2QGH1wa85nbN2-/view?usp=sharing) (google drive link), and put it under `./checkpoints/label2city_1024p/`
 - Test the model (`bash ./scripts/test_1024p.sh`):
 ```bash
 #!./scripts/test_1024p.sh
@@ -47,17 +53,9 @@ More example scripts can be found in the `scripts` directory.
 
 
 ### Dataset
-- We collect 100 3D shapes from 10 classes from [ShapeNet](https://www.shapenet.org/) that are also exist in [ImagNet](http://www.image-net.org/) and made sure that networks trained on ImageNEt identifies these shapes of ShapeNet nefore proceeding. All the obj files are availabe in the `sacel` folder which contain the dataset. The following are visuailzations of the 3D dataset used in our paper. 
-<img src='./results/class_0_.gif' width=150>  <img src='./results/class_1_.gif' width=150>  <img src='./results/class_2_.gif' width=150>  <img src='./results/class_3_.gif' width=150>  <img src='./results/class_4_.gif' width=150>  <img src='./results/class_5_.gif' width=150> <img src='./results/class_6_.gif' width=150>  <img src='./results/class_7_.gif' width=150> <img src='./results/class_8_.gif' width=150>  <img src='./results/class_9_.gif' width=150> 
+- We collect 100 3D shapes from 10 classes from [ShapeNet](https://www.shapenet.org/) that are also exist in [ImagNet](http://www.image-net.org/) and made sure that networks trained on ImageNEt identifies these shapes of ShapeNet nefore proceeding. All the obj files are availabe in the `sacale` directory which contain the dataset. The following are visuailzations of the 3D dataset used in our paper.
 
-### Training
-- Train a model at 1024 x 512 resolution (`bash ./scripts/train_512p.sh`):
-```bash
-#!./scripts/train_512p.sh
-python train.py --name label2city_512p
-```
-- To view training results, please checkout intermediate results in `./checkpoints/label2city_512p/web/index.html`.
-If you have tensorflow installed, you can see tensorboard logs in `./checkpoints/label2city_512p/logs` by adding `--tf_log` to the training scripts.
+<img src='./results/class_0_.gif' width=150>  <img src='./results/class_1_.gif' width=150>  <img src='./results/class_2_.gif' width=150>  <img src='./results/class_3_.gif' width=150>  <img src='./results/class_4_.gif' width=150>  <img src='./results/class_5_.gif' width=150> <img src='./results/class_6_.gif' width=150>  <img src='./results/class_7_.gif' width=150> <img src='./results/class_8_.gif' width=150>  <img src='./results/class_9_.gif' width=150> 
 
 ### Testing with your own 3D dataset and networks
 - `TODO NEXT`
