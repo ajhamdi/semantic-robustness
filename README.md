@@ -6,39 +6,9 @@
 Pytorch implementation of our method for ...... <br><br>
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
  [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
-<img src='./some_examples/robustness_out.gif' align="right" width=200> <br> 
 ## examples
-- Our label-to-streetview results
-<p align='center'>  
-  <img src='imgs/teaser_label.png' width='400'/>
-  <img src='imgs/teaser_ours.jpg' width='400'/>
-</p>
-- Interactive editing results
-<p align='center'>  
-  <img src='imgs/teaser_style.gif' width='400'/>
-  <img src='imgs/teaser_label.gif' width='400'/>
-</p>
-- Additional streetview results
-<p align='center'>
-  <img src='imgs/cityscapes_1.jpg' width='400'/>
-  <img src='imgs/cityscapes_2.jpg' width='400'/>
-</p>
-<p align='center'>
-  <img src='imgs/cityscapes_3.jpg' width='400'/>
-  <img src='imgs/cityscapes_4.jpg' width='400'/>
-</p>
-
-- Label-to-face and interactive editing results
-<p align='center'>
-  <img src='imgs/face1_1.jpg' width='250'/>
-  <img src='imgs/face1_2.jpg' width='250'/>
-  <img src='imgs/face1_3.jpg' width='250'/>
-</p>
-<p align='center'>
-  <img src='imgs/face2_1.jpg' width='250'/>
-  <img src='imgs/face2_2.jpg' width='250'/>
-  <img src='imgs/face2_3.jpg' width='250'/>
-</p>
+<br> <br>
+<img src='./some_examples/robustness_out.gif' align="right" width=200> <br> 
 
 - Our editing interface
 <p align='center'>
