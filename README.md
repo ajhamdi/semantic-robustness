@@ -1,5 +1,5 @@
-<img src='./some_examples/robustness_out.gif' align="right" width=180>
-<img src='./results/azimuth_performance_TEAPOT.pdf' align="right" width=360>
+<img src='./some_examples/robustness_out.gif' align="right" width=180><br>
+<embed src='./results/azimuth_performance_TEAPOT.pdf' width="400" type="application/pdf">
 <br><br><br><br>
 
 # semantic-robustness
