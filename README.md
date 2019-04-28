@@ -1,4 +1,4 @@
-<img src='.//results/teapot.jpg' align="right" width=500>
+<img src='./some_examples/robustness_out.gif' align="right" width=250> <br> 
 <br><br><br><br>
 
 # semantic-robustness
@@ -8,7 +8,9 @@ Pytorch implementation of our method for ...... <br><br>
  [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
 
 ## examples
-<img src='./some_examples/robustness_out.gif' align="right" width=230> <br> 
+- ### visualizing the Deep networks profiles for some objects in the 
+<img src='.//results/teapot.jpg' align="right" width=500>
+
 ## Prerequisites
 - Linux 
 - Python 2 or 3
