@@ -1,9 +1,10 @@
-<img src='./some_examples/robustness_out.gif' align="right" width=360>
-
+<img src='./some_examples/robustness_out.gif' align="right" width=180><br>
+<embed src="https://drive.google.com/viewerng/
+viewer?embedded=true&url=https://github.com/ajhamdi/semantic-robustness/blob/master/results/azimuth_performance_TEAPOT.pdf" width="500" height="375">
 <br><br><br><br>
 
 # semantic-robustness
-### [Paper](https://arxiv.org/pdf/1904.04621.pdf) <br>
+### [Paper](https://arxiv.org/pdf/1904.04621.pdf) | [Tutorial](https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn)<br>
 Pytorch implementation of our method for ...... <br><br>
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
  [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
