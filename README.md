@@ -1,5 +1,5 @@
 <img src='.//results/teapot.jpg' align="right" width=500>
-<img src='./some_examples/robustness_out.gif' align="center" width=200>  
+<img src='./some_examples/robustness_out.gif' align="center" width=250>  
 <br><br><br><br>
 
 # Semantic Robustness of Deep Neural Networks
