@@ -3,7 +3,7 @@
 <br><br><br><br>
 
 # semantic-robustness
-### [Paper](https://arxiv.org/pdf/1904.04621.pdf) <br>
+### [Paper](https://arxiv.org/pdf/1904.04621.pdf) | [Tutorial](https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn)<br>
 Pytorch implementation of our method for ...... <br><br>
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
  [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
