@@ -59,26 +59,6 @@ python train.py --name label2city_512p
 - To view training results, please checkout intermediate results in `./checkpoints/label2city_512p/web/index.html`.
 If you have tensorflow installed, you can see tensorboard logs in `./checkpoints/label2city_512p/logs` by adding `--tf_log` to the training scripts.
 
-### Cluster testing 
-- Test the models on the cluster of GPUs ( if you have access to one ) 
-```bash
-bash gpu_start.sh
-```
-Note: this is not tested and we trained our model using single GPU only. Please use at your own discretion.
-
-### Training with Automatic Mixed Precision (AMP) for faster speed
-- To train with mixed precision support, please first install apex from: https://github.com/NVIDIA/apex
-- You can then train the model by adding `--fp16`. For example,
-```bash
-#!./scripts/train_512p_fp16.sh
-python -m torch.distributed.launch train.py --name label2city_512p --fp16
-```
-In our test case, it trains about 80% faster with AMP on a Volta machine.
-
-### Training at full resolution
-- To train the images at full resolution (2048 x 1024) requires a GPU with 24G memory (`bash ./scripts/train_1024p_24G.sh`), or 16G memory if using mixed precision (AMP).
-- If only GPUs with 12G memory are available, please use the 12G script (`bash ./scripts/train_1024p_12G.sh`), which will crop the images during training. Performance is not guaranteed using this script.
-
 ### Testing with your own 3D dataset and networks
 - `TODO NEXT`
 
