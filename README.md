@@ -1,4 +1,4 @@
-<img src='.//results/teapot.jpg' align="right" width=500><br>
+<img src='.//results/teapot.jpg' align="right" width=500><br> <br><br><br>
 <img src='./some_examples/robustness_out.gif' align="right" width=200> <br>
 <br><br><br><br>
 
