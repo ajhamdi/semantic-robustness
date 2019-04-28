@@ -1,5 +1,5 @@
 <img src='.//results/teapot.jpg' align="right" width=500>
-<img src='./some_examples/robustness_out.gif' align="right" width=130>  
+<img src='./some_examples/robustness_out.gif' align="left" width=130>  
 <br><br><br><br>
 
 # semantic-robustness
