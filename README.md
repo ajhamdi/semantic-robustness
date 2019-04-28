@@ -6,15 +6,9 @@
 Pytorch implementation of our method for ...... <br><br>
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
  [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
-<img src='./some_examples/robustness_out.gif' align="right" width=230> <br> 
+
 ## examples
-
-- Our editing interface
-<p align='center'>
-  <img src='imgs/city_short.gif' width='330'/>
-  <img src='imgs/face_short.gif' width='450'/>
-</p>
-
+<img src='./some_examples/robustness_out.gif' align="right" width=230> <br> 
 ## Prerequisites
 - Linux 
 - Python 2 or 3
