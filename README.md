@@ -42,8 +42,8 @@ cd semantic-robustness
 
 
 ### Simple Colab Tutorial with toy example:
-We provide a simple tutorial on colab [here]((https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn)) to test a toy example on some 3D objects and apply the bound optimzation algorithms for sample points in the 1D case. The complete results obtained in the `results` directory are obtained as follws  
-The test results will be saved as ` to a html file here: `./results/*network name*/*.html`.
+We provide a simple tutorial on colab [here](https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn) to test a toy example on some 3D objects and apply the bound optimzation algorithms for sample points in the 1D case directly on the cloud. The complete results obtained in the `results` directory are obtained as of the following sections  
+The test results will be saved as ` to a html file here: `./results/**network name**/*.html`.
 
 More example scripts can be found in the `scripts` directory.
 
