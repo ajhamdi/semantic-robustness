@@ -64,6 +64,7 @@ We provide a simple tutorial on colab [here](https://colab.research.google.com/d
 
 ### Saving the results
 The `checkpoint` directory is arranged as follws :
+ ```
  ├── ...
     ├── checkpont                    # contaong the optimzatations traces of all experiments 
     │   ├── *network name*           # the network
@@ -71,7 +72,7 @@ The `checkpoint` directory is arranged as follws :
                  ├── *object number*    #number of the object (0-9) from the 10 objects in that specific class 
     │   └── ...               
     └── ...
-    
+```
 The optimization test results will be saved as dictionaries to the directory : `./results/*network name*/*class number*/*object number*/optim.pt`. where:
 - *network name* is the name of the network being analyzed 
 - *class number* is the class number (0-9) whcih is part of the 10 3D classes above and also part of ImageNet Classes  
