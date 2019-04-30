@@ -41,15 +41,9 @@ cd semantic-robustness
 ```
 
 
-### Simple Tutorial:
-- We provide a simple tutorial 
-Please download the pre-trained Cityscapes model from [here](https://drive.google.com/file/d/1h9SykUnuZul7J3Nbms2QGH1wa85nbN2-/view?usp=sharing) (google drive link), and put it under `./checkpoints/label2city_1024p/`
-- Test the model (`bash ./scripts/test_1024p.sh`):
-```bash
-#!./scripts/test_1024p.sh
-python test.py --name label2city_1024p --netG local --ngf 32 --resize_or_crop none
-```
-The test results will be saved to a html file here: `./results/label2city_1024p/test_latest/index.html`.
+### Simple Colab Tutorial with toy example:
+We provide a simple tutorial on colab [here]((https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn)) to test a toy example on some 3D objects and apply the bound optimzation algorithms for sample points in the 1D case. The complete results obtained in the `results` directory are obtained as follws  
+The test results will be saved as ` to a html file here: `./results/*network name*/*.html`.
 
 More example scripts can be found in the `scripts` directory.
 
