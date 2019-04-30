@@ -43,15 +43,29 @@ cd semantic-robustness
 
 ### Simple Colab Tutorial with a toy example:
 We provide a simple tutorial on colab [here](https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn) to test a toy example on some 3D objects and apply the bound optimzation algorithms for sample points in the 1D case directly on the cloud. The complete results obtained in the `results` directory are obtained as of the following sections  
-The test results will be saved as ` to a html file here: `./results/__network name__/*.html`.
-
-More example scripts can be found in the `scripts` directory.
 
 
 ### Dataset
-- We collect 100 3D shapes from 10 classes from [ShapeNet](https://www.shapenet.org/) that are also exist in [ImagNet](http://www.image-net.org/) and made sure that networks trained on ImageNEt identifies these shapes of ShapeNet nefore proceeding. All the obj files are availabe in the `sacale` directory which contain the dataset. The following are visuailzations of the 3D dataset used in our paper.
-
+- We collect 100 3D shapes from 10 classes from [ShapeNet](https://www.shapenet.org/) that are also exist in [ImagNet](http://www.image-net.org/) and made sure that networks trained on ImageNEt identifies these shapes of ShapeNet nefore proceeding. All the obj files are availabe in the `sacale` directory which contain the dataset. The classes are the following 
+1. **aeroplane** : with ImageNet class label 404
+1. **bathtub** : with ImageNet class label 435
+1. **bench** : with ImageNet class label 703
+1. **bottle** : with ImageNet class label 898
+1. **chair** : with ImageNet class label 559
+1. **cup** : with ImageNet class label 968
+1. **piano** : with ImageNet class label 579
+1. **rifle** : with ImageNet class label 413
+1. **vase** : with ImageNet class label 883
+1. **toilet** : with ImageNet class label 861
+#### visualization:
 <img src='./results/class_0_.gif' width=150>  <img src='./results/class_1_.gif' width=150>  <img src='./results/class_2_.gif' width=150>  <img src='./results/class_3_.gif' width=150>  <img src='./results/class_4_.gif' width=150>  <img src='./results/class_5_.gif' width=150> <img src='./results/class_6_.gif' width=150>  <img src='./results/class_7_.gif' width=150> <img src='./results/class_8_.gif' width=150>  <img src='./results/class_9_.gif' width=150> 
+
+<br>
+### Saving the results
+The test results will be saved as dictionaries to the directory : `./results/*network name*/*class number*/*object number*/optim.pt`. where:
+- *network name* is the name of the network being analyzed 
+- *class number* is the class number (0-9) whcih is part of the 10 3D classes above and also part of ImageNet Classes  
+
 
 ### Testing with your own 3D dataset and networks
 - `TODO NEXT`
