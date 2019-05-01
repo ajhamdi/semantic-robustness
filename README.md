@@ -62,11 +62,13 @@ We provide a simple tutorial on colab [here](https://colab.research.google.com/d
 
 <br>
 
-### Mapping the deep networks fully
+### Running the full experiments
+
+1. #### Mapping the deep networks fully
 you have to run `map.py` with the following options 
 
 
-### Finding the robust regions of the networks 
+1. #### Finding the robust regions of the networks 
 you have to run `test.py` with the following options 
 
 
@@ -85,11 +87,11 @@ The `checkpoint` directory contains the results as dictionaries and is arranged 
 The optimization test results will be saved as dictionaries to the directory : `./results/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results will be wsaved in `./results/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt`   where:
 - NETWORK_NAME is the name of the network being analyzed 
 - CLASS_NUMBER is the class number (0-9) whcih is part of the 10 3D classes above and also part of ImageNet Classes  
--OBJECT_NUMBER is the number of the object (0-9) from the 10 objects in that specific class
+- OBJECT_NUMBER is the number of the object (0-9) from the 10 objects in that specific class
 
-The `mapt.pt` dictionary contains the following:
+The `map.pt` dictionary contains the following:
 
-- the `optim.pt` dictionary contains the following:
+The `optim.pt` dictionary contains the following:
 
 
 
