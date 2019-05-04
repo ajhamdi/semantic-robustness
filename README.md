@@ -10,21 +10,22 @@ Pytorch implementation of the paper on Arxive. The paper tries to address the ro
 
 ## Examples of Results
 - ### visualizing the Deep networks average semantic profiles (1D) for 10 objects for 10 classes.
-<img src='.//results/toilet.jpg' align="center" width=500>
+<img src='./results/toilet.jpg' align="center" width=500>
 
 - ### Detecting robust regions of the networks with bounds-optimzing algorithms (1D).
 <img src='./some_examples//optimization1_video.gif' align="center" width=500>  
-<img src='.//results/run_120.jpg' align="right" width=500>
+<img src='./results/run_120.jpg' align="right" width=400>
 
 - ### visualizing the Deep networks semantic profiles (2D) for 100 objects from 10 classes.
-<img src='.//results/toilet.jpg' align="center" width=500>
+<img src='./some_examples//myfull.gif' align="center" width=200>  
+<img src='./results/bathtub2map.png' align="right" width=500>
 
 - ### Detecting robust regions of the networks with bounds-optimzing algorithms (2D).
-<img src='.//results/toilet.jpg' align="center" width=500>
+<img src='./results/bathtub2D.png' align="center" width=500>
 
 
 - ### Visualizinfg the semantic bias in [ImageNet](http://www.image-net.org/) dataset for 10 differnt classes.
-<img src='.//results/toilet.jpg' align="center" width=500>
+<img src='./results/rifle.png' align="center" width=500>
 
 
 ## Prerequisites
