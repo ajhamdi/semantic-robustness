@@ -3,7 +3,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torchvision import datasets, models, transforms
 import glob
+import imageio
 from scipy import stats
 from torch.optim import lr_scheduler
 import neural_renderer as nr
@@ -242,7 +244,7 @@ def test_optimization_1(network_model,network_name,class_nb,object_nb,all_initia
     optim_dict = torch.load(file)
     return optim_dict
 
-def evaluate_robustness(model, shapes_list, class_label, camera_distance, elevation, analysis_domain, image_size, data_dir=None, save_gif=True):
+def evaluate_robustness(model, shapes_list, class_label, camera_distance, elevation, analysis_domain, image_size,class_nb, data_dir=None, device=None,save_gif=True):
     """
     evluate the robustness of the DNN model over the fulll range of domain analysis ias azimujth angles and record a gif of teh rotated object 
     """
