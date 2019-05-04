@@ -15,8 +15,8 @@ Pytorch implementation of the paper on Arxive. The paper tries to address the ro
 - ### Detecting robust regions of the networks with bounds-optimzing algorithms (1D).
  
  <p float="left">
-<img src='./some_examples/optimization1_video.gif' align="left" width=450 /> 
-<img src='./results/run_120.jpg' align="right" width=380 />
+<img src='./some_examples/optimization1_video.gif' width=450 /> 
+<img src='./results/run_120.jpg' width=380 />
 </p>
 
 - ### visualizing the Deep networks semantic profiles (2D) for 100 objects from 10 classes.
