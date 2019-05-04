@@ -9,15 +9,22 @@ Pytorch implementation of the paper on Arxive. The paper tries to address the ro
  [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
 
 ## Examples of Results
-- ### visualizing the Deep networks average semantic profiles for 10 objects.
+- ### visualizing the Deep networks average semantic profiles (1D) for 10 objects for 10 classes.
 <img src='.//results/toilet.jpg' align="center" width=500>
 
-- ### visualizing the Deep networks semantic profiles for average  objects.
+- ### Detecting robust regions of the networks with bounds-optimzing algorithms (1D).
+<img src='./some_examples//optimization1_video.gif' align="center" width=500>  
+<img src='.//results/run_120.jpg' align="right" width=500>
+
+- ### visualizing the Deep networks semantic profiles (2D) for 100 objects from 10 classes.
 <img src='.//results/toilet.jpg' align="center" width=500>
 
-- ### visualizing the Deep networks semantic profiles for average  objects.
+- ### Detecting robust regions of the networks with bounds-optimzing algorithms (2D).
 <img src='.//results/toilet.jpg' align="center" width=500>
 
+
+- ### Visualizinfg the semantic bias in [ImageNet](http://www.image-net.org/) dataset for 10 differnt classes.
+<img src='.//results/toilet.jpg' align="center" width=500>
 
 
 ## Prerequisites
@@ -84,7 +91,7 @@ The `checkpoint` directory contains the results as dictionaries and is arranged 
     │   └── ...               
     └── ...
 ```
-The optimization test results will be saved as dictionaries to the directory : `./results/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results will be wsaved in `./results/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt`   where:
+The optimization test results from `test.py` will be saved as dictionaries to the directory : `./results/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results from `map.py` will be wsaved in `./results/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt`   where:
 - NETWORK_NAME is the name of the network being analyzed 
 - CLASS_NUMBER is the class number (0-9) whcih is part of the 10 3D classes above and also part of ImageNet Classes  
 - OBJECT_NUMBER is the number of the object (0-9) from the 10 objects in that specific class
