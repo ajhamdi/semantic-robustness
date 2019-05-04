@@ -17,11 +17,10 @@ Pytorch implementation of the paper on Arxive. The paper tries to address the ro
     <div class="inline-block">
 <img src='./some_examples//optimization1_video.gif' align="left" width=450> 
     </div>
-
     <div class="inline-block">
 <img src='./results/run_120.jpg' align="right" width=380>
     </div>
-</div>
+   </div>
 
 - ### visualizing the Deep networks semantic profiles (2D) for 100 objects from 10 classes.
 <img src='./some_examples//myfull.gif' align="center" width=200>  
