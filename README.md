@@ -8,6 +8,19 @@ Pytorch implementation of the paper on Arxive. The paper tries to address the ro
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
  [Abdullah Hamdi](http://www.fihm.ai), [Bernard Ghanem](http://www.bernardghanem.com/)
 
+## Citation
+
+If you find this useful for your research, please use the following.
+
+```
+@article{hamdi2019towards,
+  title={Towards Analyzing Semantic Robustness of Deep Neural Networks},
+  author={Hamdi, Abdullah and Ghanem, Bernard},
+  journal={arXiv preprint arXiv:1904.04621},
+  year={2019}
+}
+```
+
 ## Examples of Results
 - ### visualizing the Deep networks average semantic profiles (1D) for 10 objects for 10 classes.
 <img src='./results/toilet.jpg' align="center" width=500>
@@ -110,18 +123,6 @@ The `optim.pt` dictionary contains the following:
 ### Testing with your own 3D dataset and networks
 - `TODO NEXT`
 
-## Citation
-
-If you find this useful for your research, please use the following.
-
-```
-@article{hamdi2019towards,
-  title={Towards Analyzing Semantic Robustness of Deep Neural Networks},
-  author={Hamdi, Abdullah and Ghanem, Bernard},
-  journal={arXiv preprint arXiv:1904.04621},
-  year={2019}
-}
-```
 
 ## Acknowledgments
 This work is suuported by King Abdullah University of Science and Technology (KAUST).The code borrows heavily from [neural mesh renderer](https://github.com/daniilidis-group/neural_renderer).
