@@ -1,2 +1,0 @@
-/home/hamdiaj/.conda/envs/mytensor/bin/activate: line 62: /home/hamdiaj/.conda/envs/mytensor/bin/deactivate: No such file or directory
-slurmstepd: error: *** JOB 1745833 ON gpu502-11 CANCELLED AT 2019-03-21T09:30:10 ***
