@@ -60,10 +60,10 @@ def main(network, all_points ,class_nb, object_nb , override, reduced, iteration
         all_initial_points = [np.array([310,50])]
         test_optimization(network_model,network_name,class_nb,object_nb,all_initial_points,obj_class_list,object_list,setup,data_dir=data_dir,override=override,reduced=reduced ,device=device)
     elif not custom_points :
-        if network == "alexnet":
-            class_nb = special_list[class_nb]
+#       if network == "alexnet":
+#           class_nb = special_list[class_nb]
         print("you asked for all points ... ")
-        all_initial_points = [np.array([130,30]),np.array([50,20]),np.array([200,15]),np.array([310,50])]
+        all_initial_points = [np.array([170,80]),np.array([10,10]),np.array([250,80]),np.array([350,30]),np.array([40,45]),np.array([300,-5])]
         shapes_dir = os.path.join(data_dir,"scale",object_list[class_nb])
         shapes_list = list(glob.glob(shapes_dir+"/*"))
         for myobject_nb in range(len(shapes_list)):
