@@ -35,9 +35,19 @@ def gif_folder(data_dir, extension="jpg",duration=None):
     else:
         imageio.mimsave(os.path.join(data_dir, "video.gif"), image_collection, duration=duration)
 
+
 def check_folder(data_dir):
+    """
+    checks if folder exists and create if doesnt exist 
+    """
     if not os.path.exists(data_dir):
         os.mkdir(data_dir)
+
+
+def listdir_nohidden(path):
+    for f in os.listdir(path):
+        if not f.startswith('.'):
+            yield f
 
 
 def int2binarray(number, n_bits ): 
@@ -271,7 +281,7 @@ def visualize_network_2_avg(map_dict_list,object_list,optim_dict=None,data_dir=N
 
 def visualize_network_2_avg_avg(all_networks_list,object_list,optim_dict=None,data_dir=None,heatmap=True):
     """
-    create a 
+    create a map of bias in the dataset of some class by avergaing 2d profiles of all the networks and all the shapes for a praticular class 
     """
 #     network = map_dict["network_name"]
     class_nb = all_networks_list[0][0]["class_nb"] ; yy = all_networks_list[0][0]["yy"] ; xx= all_networks_list[0][0]["xx"] 

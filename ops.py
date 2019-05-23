@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.autograd import Variable
 from torchvision import datasets, models, transforms
 import glob
 import imageio
@@ -12,6 +13,19 @@ import neural_renderer as nr
 from models import *
 
 
+
+
+def PCA(data, k=2):
+    # preprocess the data
+    X = torch.from_numpy(data)
+    X_mean = torch.mean(X, 0)
+    X = X - X_mean.expand_as(X)
+
+    # svd
+    U, S, V = torch.svd(torch.t(X))
+    result = torch.mm(X, U[:, :k])
+    return result
+
 def load_mymesh(filename_obj):
     vertices, faces = nr.load_obj(filename_obj)
     # [num_vertices, XYZ] -> [batch_size=1, num_vertices, XYZ]
@@ -19,6 +33,124 @@ def load_mymesh(filename_obj):
     faces = faces[None, :, :]  # [num_faces, 3] -> [batch_size=1, num_faces, 3]
     return vertices, faces
 
+
+def render_evaluate_features(obj_file,camera_distance,elevation,azimuth,light_direction=[0,1,0],image_size=224,model=None,class_label=0,device=None):
+    texture_size = 2
+#     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    # load .obj
+    vertices, faces = nr.load_obj(obj_file)
+    vertices = vertices[None, :, :]
+    faces = faces[None, :, :]  # [num_faces, 3] -> [batch_size=1, num_faces, 3]
+
+    # create texture [batch_size=1, num_faces, texture_size, texture_size, texture_size, RGB]
+    textures = torch.ones(
+        1, faces.shape[1], texture_size, texture_size, texture_size, 3, dtype=torch.float32).to(device)
+    light_direction = nn.functional.normalize(torch.FloatTensor(
+        light_direction), dim=0, eps=1e-16).numpy().tolist()
+    renderer = nr.Renderer(
+        camera_mode='look_at', image_size=image_size, light_direction=light_direction)
+    renderer.eye = nr.get_points_from_angles(
+        camera_distance, elevation, azimuth)
+    # [batch_size, RGB, image_size, image_size]
+    images = renderer(vertices, faces, textures,)
+#     print(type(images)) ;  print(len(images)) ; print(images.shape)
+#     if not data_dir:
+#         data_dir , filename = os.path.split(obj_file)
+#         filename = os.path.splitext(filename)[0]
+#     else:
+#         filename = "class"
+#     image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
+#     imsave(os.path.join(data_dir,"examples",filename+"_%d_%d_%d.jpg" %(azimuth,elevation,camera_distance)),(255*image).astype(np.uint8))
+    if model:
+        with torch.no_grad():
+            prop = model(images)
+        return prop[0,:].detach().cpu().numpy()
+
+
+def render_evaluate_features_batch(obj_files, camera_distance, elevations_and_azimuths, light_direction=[0, 1, 0], image_size=224, model=None, class_labels=[], device="cuda:0"):
+    batch_features = []
+    for obj_file,elevation_and_azimuth,class_label in zip(obj_files,elevations_and_azimuths,class_labels):
+        batch_features.append(render_evaluate_features(obj_file, camera_distance, elevation_and_azimuth[1], elevation_and_azimuth[0], light_direction=[
+                              0, 1, 0], image_size=224, model=model, class_label=0, device=device))
+    return batch_features
+    
+
+def full_epoch(model, optimizer, loss_func, data_loader, data_set,device, cfg):
+    if data_set.part == "train":
+        model.train()
+    else:
+        model.eval()
+    running_loss = 0.0
+    running_corrects = 0.0
+    for i, (shape_feature, srvr, initial_point, obj_file, class_nbr) in enumerate(data_loader):
+
+        #         print("@@@@@@@@@@@@")
+        #         print(len(shape_feature))
+        #         print(srvr.shape,initial_point.shape,obj_file.shape)
+        if cfg["is_weight_learning"]:
+            if data_set.network_name == "ResNet50" or data_set.network_name == "Inceptionv3":
+                network_feature = PCA(data_set.model.fc.weight.detach().cpu().numpy(
+                ), k=cfg["PCA_size"]).view(1, -1).repeat(len(shape_feature), 1)
+            else:
+                network_feature = PCA(data_set.model.classifier[6].weight.detach().cpu(
+                ).numpy(), k=cfg["PCA_size"]).view(1, -1).repeat(len(shape_feature), 1)
+ #           network_feature = PCA(resnet.fc.weight.detach().cpu().numpy().T,k=PCA_size).view(1,-1).repeat(len(shape_feature),1)
+        else:
+            network_feature = render_evaluate_features_batch(obj_file, camera_distance=2.732, elevations_and_azimuths=initial_point, light_direction=[
+                                                             0, 1, 0], image_size=224, model=data_set.model, class_labels=class_nbr,device=device)
+        network_feature = torch.from_numpy(np.array(network_feature))
+        shape_feature = Variable(torch.cuda.FloatTensor(shape_feature.cuda()))
+        initial_point = Variable(torch.cuda.FloatTensor(initial_point.cuda()))
+#         print(shape_feature.shape)
+        network_feature = Variable(
+            torch.cuda.FloatTensor(network_feature.cuda()))
+        srvr = Variable(torch.cuda.FloatTensor(srvr.cuda()))
+        features_list = [network_feature]
+#         srvr = Variable(torch.cuda.LongTensor(srvr.cuda()))
+#         print(srvr)
+        if cfg["is_shape_features"]:
+            features_list += [shape_feature]
+        if cfg["is_initial_point"]:
+            features_list += [initial_point]
+        x = torch.cat(features_list, 1)
+        optimizer.zero_grad()   # clear gradients for next train
+        if data_set.part == "train":
+            prediction = model(x)     # input x and predict based on x
+            all_linear1_params = torch.cat(
+                [x.view(-1) for x in model.parameters()])
+            l2_reg = cfg["lambda1"] * torch.norm(all_linear1_params, 2)
+#             print(" train prediction: \n ",prediction)
+#             print(" train srvrr: \n ",srvr)
+            # must be (1. nn output, 2. target)
+            loss = loss_func(prediction, srvr) + l2_reg
+    #         print("$$$$$$$$$",loss.item())
+            running_loss += loss.item() * cfg["BATCH_SIZE"]
+            loss.backward()         # backpropagation, compute gradients
+            optimizer.step()        # apply gradients
+
+        else:
+            with torch.no_grad():
+                prediction = model(x)     # input x and predict based on x
+                # must be (1. nn output, 2. target)
+                loss = loss_func(prediction, srvr)
+#                 print("$$$$$$$$$",loss.item())
+                running_loss += loss.item() * cfg["BATCH_SIZE"]
+
+        if cfg["is_classificaion"]:
+            prediction = prediction.detach().cpu().numpy()
+            srvr = srvr.detach().cpu().numpy()
+#             print((prediction.squeeze().astype(np.float) >= 0.5) - srvr)
+        running_corrects += np.sum(((prediction.squeeze().astype(np.float)
+                                     >= 0.5) - srvr) == np.zeros_like(srvr))
+    #         [summaries.update({"cfg/"+K : V}) for K ,V in cfg.items()]
+    #         summaries.update({'metrics/loss' : loss.item()})
+    #         summaries.update({'valid/' + name: value for name, value in valid_metrics.items()})
+    #         values = [tf.Summary.Value(tag=k, simple_value=v) for k, v in summaries.items()]
+    #         log_dir.add_summary(tf.Summary(value=values), global_step)
+    #         log_dir.flush()
+    #         global_step = global_step + 1
+    return running_loss, running_corrects
 
 def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, beta=0.01, reg=0.001, n_iterations=500, exp_type="inner"):
     optimization_trace = []

@@ -1,7 +1,9 @@
 import sys
+import os
 import numpy as np
 from numpy.linalg import inv
 import torch
+import glob
 import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, models, transforms
@@ -9,9 +11,30 @@ from scipy import stats
 from torch.optim import lr_scheduler
 import neural_renderer as nr
 from interval import interval
-from utils import int2binarray
+import torch.utils.data as data
+import torch.nn.functional as F
+from utils import int2binarray, listdir_nohidden
 # aLL torch models are put here
 
+
+type_to_index_map = {
+    'aeroplane': 0, "bathtub": 1, 'bench': 2, 'bottle': 3, 'chair': 4,
+    "cup": 5, "piano": 6, 'rifle': 7, 'vase': 8, "toilet": 9}
+
+index_to_type_map = dict([[v, k] for k, v in type_to_index_map.items()])
+
+
+def list_features_shapenet_classes(class_dir, epoch=160):
+    objec_nb_list = []
+    shapes_list = list(
+        glob.glob(class_dir+"/*/models/features_{}.npz".format(epoch)))
+    mesh_file_list = list(glob.glob(class_dir+"/*"))
+    mesh_file_list = [os.path.join(
+        x, "models", "features_{}.npz".format(epoch)) for x in mesh_file_list]
+    for ii, sh in enumerate(mesh_file_list):
+        if sh in shapes_list:
+            objec_nb_list.append(ii)
+    return zip(objec_nb_list, shapes_list)
 
 class renderer_model_2(nn.Module):
     def __init__(self, network_model, vertices, faces, camera_distance, elevation, azimuth, image_size, device=None):
@@ -158,3 +181,97 @@ class ndinterval():
         return [x | y for x, y in zip(self.region, interval2.region)]
 
 
+class ShapeFeatures(data.Dataset):
+    def __init__(self, model=None, network_name=None, classification=False, root_dir=None, part="train"):
+        self.data_dir = root_dir
+        self.root =  os.path.join(self.data_dir, "scale")
+        self.part = part
+        self.pt_train_max = 6
+        self.pt_test_max = 4
+        self.model = model
+        self.classification = classification
+        self.CALSS_THRESHOLD = 0.05
+        self.network_name = network_name
+        print("##########", self.root)
+        self.data = []
+        for class_name in listdir_nohidden(self.root):
+            type_index = type_to_index_map[class_name]
+            type_root = os.path.join(os.path.join(self.root, class_name))
+            # for filename in os.listdir(type_root):
+            #     if filename.endswith('.npz'):
+            #         self.data.append((os.path.join(type_root, filename), type_index))
+            for object_nb, filename in list_features_shapenet_classes(type_root, epoch=410):
+                if filename.endswith('.npz'):
+                    if self.part == "train":
+                        self.data.extend(self.pt_train_max *
+                                         [(filename, type_index, object_nb)])
+                    else:
+                        self.data.extend(self.pt_test_max *
+                                         [(filename, type_index, object_nb)])
+#                     self.data.append((filename, type_index,object_nb))
+
+    def __getitem__(self, i):
+        path, class_nbr, object_nb = self.data[i]
+#         mesh = trimesh.load_mesh(path, file_type='obj', resolver=None)
+#         while len(mesh.faces)> self.FACE_THRESHOLD :
+#             path, class_nbr = self.data[np.random.randint(0,len(self.data))]
+#             mesh = trimesh.load_mesh(path, file_type='obj', resolver=None)
+
+        obj_file = os.path.join(os.path.split(path)[0], "model_normalized.obj")
+        shape_feature = np.load(path)['features']
+
+        if self.part == "train":
+            optim_dict = torch.load(os.path.join(self.data_dir, "checkpoint", self.network_name, str(
+                class_nbr), str(object_nb), "optim_t.pt"))
+            pt_idx = i % self.pt_train_max
+        else:
+            optim_dict = torch.load(os.path.join(
+                self.data_dir, "checkpoint", self.network_name, str(class_nbr), str(object_nb), "optim.pt"))
+            pt_idx = i % self.pt_test_max
+#         self.pt_idx = np.random.choice(range(len(optim_dict['initial_point'])))
+        initial_point = optim_dict['initial_point'][pt_idx]
+        srvr = optim_dict["OIR_B"]["regions"][pt_idx].size()/9000
+        if self.classification:
+            srvr = 3*srvr
+            srvr = np.int((srvr > self.CALSS_THRESHOLD))
+#         print(srvr)
+
+
+#         # data augmentation
+#         if self.augment_data and self.part == 'train':
+#             sigma, clip = 0.01, 0.05
+#             jittered_data = np.clip(sigma * np.random.randn(*face[:, :12].shape), -1 * clip, clip)
+#             face = np.concatenate((face[:, :12] + jittered_data, face[:, 12:]), 1)
+
+        # to tensor
+        shape_feature = torch.from_numpy(shape_feature).float().squeeze()
+        initial_point = torch.from_numpy(initial_point).float().squeeze()
+#         if self.classification:
+#             srvr = torch.from_numpy(np.array(srvr)).long()
+#         else :
+        srvr = torch.from_numpy(np.array(srvr)).float()
+
+        return shape_feature, srvr, initial_point, obj_file, class_nbr
+
+    def __len__(self):
+        return len(self.data)
+
+
+class SRVR_Classifier(torch.nn.Module):
+    def __init__(self, n_feature, n_output, depth):
+        super(SRVR_Classifier, self).__init__()
+        self.depth = depth-4
+        self.hidden1 = torch.nn.Linear(n_feature, 1000)   # hidden layer
+        self.hidden = torch.nn.Linear(500, 500)   # hidden layer
+        self.hidden2 = torch.nn.Linear(1000, 500)
+        self.hidden3 = torch.nn.Linear(500, 50)
+        self.predict = torch.nn.Linear(50, n_output)   # output layer
+
+    def forward(self, x):
+        x = F.relu(self.hidden1(x))
+        x = F.relu(self.hidden2(x))  # activation function for hidden layer
+        for ii in range(self.depth):
+            x = F.relu(self.hidden(x))
+        x = F.relu(self.hidden3(x))
+        x = self.predict(x)             # linear output
+        return F.sigmoid(x)
