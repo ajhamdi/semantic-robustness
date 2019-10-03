@@ -10,6 +10,7 @@ import imageio
 from scipy import stats
 from torch.optim import lr_scheduler
 import neural_renderer as nr
+from utils import *
 from models import *
 
 
@@ -152,6 +153,38 @@ def full_epoch(model, optimizer, loss_func, data_loader, data_set,device, cfg):
     #         global_step = global_step + 1
     return running_loss, running_corrects
 
+def map_network(network_model,network_name,class_nb,object_nb,obj_class_list,setup=None,data_dir=None,override=False,device="cuda:0"):
+    camera_distance = 2.732
+    azimuth = 50
+    domain_begin = 0 ; domain_end = 360 ; domain_precision = 5
+    analysis_domain = range(domain_begin, domain_end, domain_precision)
+    elevation = 35
+    image_size = 224
+    if setup:
+        a=setup["a"] ; b=setup["b"] ; precisions=setup["precisions"] 
+    else : 
+        a=[0,-10] ; b=[360,90] ; precisions=[3,3] 
+    shapes_dir = os.path.join(data_dir,"scale",object_list[class_nb])
+    shapes_list = list(glob.glob(shapes_dir+"/*"))
+
+#     object_nb = 1
+    mesh_file = os.path.join(shapes_list[object_nb],"models","model_normalized.obj")
+    mesh_file_list = [os.path.join(x,"models","model_normalized.obj") for x in shapes_list]
+    _,shape_id = os.path.split(shapes_list[object_nb])
+    vertices, faces =  load_mymesh(mesh_file)
+    renderer =  renderer_model_2(network_model,vertices,faces,camera_distance,elevation,azimuth,image_size).to(device)
+    f = lambda x:  query_robustness(renderer,obj_class_list[class_nb],x)
+    file = os.path.join(data_dir,"checkpoint",network_name,str(class_nb),str(object_nb),"map.pt" )
+    if not os.path.exists(file) or override:
+        z,xx,yy = evaluate_robustness_2(renderer,a,b,precisions,class_nb,obj_class_list)
+        map_dict = {"xx":xx , "yy":yy, "z":z ,"class_nb":class_nb,"shape_id":shape_id,"network_name":network_name}
+        path,_ = os.path.split(file)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        torch.save(map_dict, file)
+    map_dict = torch.load(file)
+    return map_dict
+    
 def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, beta=0.01, reg=0.001, n_iterations=500, exp_type="inner"):
     optimization_trace = []
     loss_trace = []
@@ -471,7 +504,7 @@ def render_from_point(obj_file, camera_distance, elevation, azimuth, image_size,
     imsave(file, (255 * image).astype(np.uint8))
 
 
-def render_region(obj_file, camera_distance, elevations, azimuths, image_size, data_dir=None, name=None):
+def render_region(obj_file, camera_distance, elevations, azimuths, image_size, data_dir=None, name=None, device=None):
     filename = os.path.split(obj_file)[1]
     if not data_dir:
         data_dir, filename = os.path.split(obj_file)
@@ -489,7 +522,8 @@ def render_region(obj_file, camera_distance, elevations, azimuths, image_size, d
     # create texture [batch_size=1, num_faces, texture_size, texture_size, texture_size, RGB]
     textures = torch.ones(
         1, faces.shape[1], texture_size, texture_size, texture_size, 3, dtype=torch.float32).to(device)
-    renderer = nr.Renderer(camera_mode='look_at', image_size=image_size)
+    renderer = nr.Renderer(camera_mode='look_at',
+                           image_size=image_size).to(device)
     image_collection = []
     for elevation in elevations:
         for azimuth in azimuths:
@@ -505,10 +539,11 @@ def render_region(obj_file, camera_distance, elevations, azimuths, image_size, d
                 os.makedirs(path)
             image = images.detach().cpu().numpy()[0].transpose(
                 (1, 2, 0))  # [image_size, image_size, RGB]
-            imsave(file, (255 * image).astype(np.uint8))
+            imageio.imsave(file, (255 * image).astype(np.uint8))
             image_collection.append((255 * image).astype(np.uint8))
-    imageio.mimsave(os.path.join(data_dir, "examples", filename,
-                                 "%s_vidoe.gif" % (filename)), image_collection)
+    imageio.mimsave(os.path.join(data_dir, "examples", filename,"%s_vidoe.gif" % (filename)), image_collection)
+    imageio.imsave(os.path.join(data_dir, "examples", filename,
+                                 "%s_college.png" % (filename)), make_grid(np.array(image_collection),nrow=4))
 
 
 def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_direction=[0, 1, 0], image_size=224, data_dir=None, model=None, class_label=0):
@@ -532,7 +567,7 @@ def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_directi
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
     images = renderer(vertices, faces, textures,)
-    print(typ(images))
+    print(type(images))
     print(len(images))
     print(images.shape)
     if not data_dir:
@@ -542,7 +577,7 @@ def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_directi
         filename = "class"
     image = images.detach().cpu().numpy()[0].transpose(
         (1, 2, 0))  # [image_size, image_size, RGB]
-    imsave(os.path.join(data_dir, "examples", filename + "_%d_%d_%d.jpg" %
+    imageio.imsave(os.path.join(data_dir, "examples", filename + "_%d_%d_%d.jpg" %
                         (azimuth, elevation, camera_distance)), (255 * image).astype(np.uint8))
     if model:
         with torch.no_grad():
