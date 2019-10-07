@@ -54,7 +54,7 @@ def render_evaluate_features(obj_file,camera_distance,elevation,azimuth,light_di
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)
+    images = renderer(vertices, faces, textures,)[0]
 #     print(type(images)) ;  print(len(images)) ; print(images.shape)
 #     if not data_dir:
 #         data_dir , filename = os.path.split(obj_file)
@@ -184,8 +184,9 @@ def map_network(network_model,network_name,class_nb,object_nb,obj_class_list,set
         torch.save(map_dict, file)
     map_dict = torch.load(file)
     return map_dict
-    
-def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, beta=0.01, reg=0.001, n_iterations=500, exp_type="inner"):
+
+
+def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, beta=0.01, reg=0.001, n_iterations=500, exp_type="inner", left_limit=np.array([0, -10]), right_limit=np.array([360, 90])):
     optimization_trace = []
     loss_trace = []
     a_grad = 0
@@ -229,6 +230,8 @@ def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, 
 
             a = a - learning_rate * (np.squeeze(a_grad))
             b = b - learning_rate * (np.squeeze(b_grad))
+
+            fix_regions(my_region,left_limit,right_limit)
             my_region(a, b)
 
     elif exp_type == "OIR_B":
@@ -258,6 +261,8 @@ def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, 
 
             a = a - learning_rate * (np.squeeze(a_grad))
             b = b - learning_rate * (np.squeeze(b_grad))
+
+            fix_regions(my_region,left_limit,right_limit)
             my_region(a, b)
 
     elif exp_type == "OIR_W":
@@ -292,6 +297,7 @@ def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, 
 
             a = a - learning_rate * (np.squeeze(a_grad))
             b = b - learning_rate * (np.squeeze(b_grad))
+            fix_regions(my_region,left_limit,right_limit)
             my_region(a, b)
 
     elif exp_type == "trap":
@@ -311,6 +317,9 @@ def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, 
 
             a = a - learning_rate * (np.squeeze(a_grad))
             b = b - learning_rate * (np.squeeze(b_grad))
+
+            fix_regions(my_region,left_limit,right_limit)
+
             my_region(a, b)
 
     #     Update rule according to gradient descent and record the new loss
@@ -443,7 +452,7 @@ def evaluate_robustness(model, shapes_list, class_label, camera_distance, elevat
             renderer.eye = nr.get_points_from_angles(
                 camera_distance, elevation, azimuth)
             # [batch_size, RGB, image_size, image_size]
-            images = renderer(vertices, faces, textures,)
+            images = renderer(vertices, faces, textures,)[0]
             with torch.no_grad():
                 prop = torch.functional.F.softmax(model(images), dim=1)
                 class_profile.append(torch.max(prop, 1)[
@@ -487,7 +496,7 @@ def render_from_point(obj_file, camera_distance, elevation, azimuth, image_size,
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)
+    images = renderer(vertices, faces, textures,)[0]
     filename = os.path.split(obj_file)[1]
     if not data_dir:
         data_dir, filename = os.path.split(obj_file)
@@ -531,7 +540,7 @@ def render_region(obj_file, camera_distance, elevations, azimuths, image_size, d
                 camera_distance, elevation, azimuth)
 
             # [batch_size, RGB, image_size, image_size]
-            images = renderer(vertices, faces, textures,)
+            images = renderer(vertices, faces, textures,)[0]
             file = os.path.join(data_dir, "examples", filename,
                                 "%d_%d.jpg" % (elevation, azimuth))
             path, _ = os.path.split(file)
@@ -566,7 +575,7 @@ def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_directi
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)
+    images = renderer(vertices, faces, textures,)[0]
     print(type(images))
     print(len(images))
     print(images.shape)

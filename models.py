@@ -10,7 +10,7 @@ from torchvision import datasets, models, transforms
 from scipy import stats
 from torch.optim import lr_scheduler
 import neural_renderer as nr
-from interval import interval
+from interval import interval  # pip install pyinterval module first
 import torch.utils.data as data
 import torch.nn.functional as F
 from utils import int2binarray, listdir_nohidden
@@ -74,7 +74,7 @@ class renderer_model_2(nn.Module):
             np.array(eval_point[1])).float().to(self.device))
         self.renderer.eye = nr.get_points_from_angles(
             self.camera_distance, self.elevation, self.azimuth)
-        images = self.renderer(self.vertices, self.faces, self.textures)
+        images = self.renderer(self.vertices, self.faces, self.textures)[0]
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
         prop = torch.functional.F.softmax(self.network_model(images), dim=1)
@@ -117,7 +117,7 @@ class renderer_model(nn.Module):
             np.array(azimuth)).float().to(self.device))
         self.renderer.eye = nr.get_points_from_angles(
             self.camera_distance, self.elevation, self.azimuth)
-        images = self.renderer(self.vertices, self.faces, self.textures)
+        images = self.renderer(self.vertices, self.faces, self.textures)[0]
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
         prop = torch.functional.F.softmax(self.network_model(images), dim=1)
@@ -257,6 +257,13 @@ class ShapeFeatures(data.Dataset):
         return len(self.data)
 
 
+def fix_regions(ndregion, smalles_a, largest_b, eps=0.00001):
+    np.clip(ndregion.b, smalles_a, largest_b, out=ndregion.b)
+    np.clip(ndregion.a, smalles_a, largest_b, out=ndregion.a)
+    problems = np.where(np.abs(ndregion.b - ndregion.a) < eps)[0]
+    for problem in problems:
+        ndregion.b[problem] = ndregion.a[problem] + eps
+    ndregion.update()
 class SRVR_Classifier(torch.nn.Module):
     def __init__(self, n_feature, n_output, depth):
         super(SRVR_Classifier, self).__init__()

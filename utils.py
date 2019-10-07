@@ -6,6 +6,7 @@ import imageio
 import numpy as np
 import logging
 import seaborn as sns
+import pandas as pd
 import shutil
 import matplotlib.patches as patches
 from IPython.display import display, HTML 
@@ -456,3 +457,119 @@ def visulize_region_growing_1(optim_dict,map_dict,object_list,point_nb=0,data_di
         plt.close()
     gif_folder(data_path,duration=0.01)
    
+
+class ListDict(object):
+    """
+    a class of list dictionary .. each element is a list , has the methods of both lists and dictionaries 
+    idel for combining the results of some experimtns and setups 
+    """
+
+    def __init__(self, keylist_or_dict=None):
+        # def initilize_list_dict(names):
+        if isinstance(keylist_or_dict, list):
+            self.listdict = {k: [] for k in keylist_or_dict}
+        elif isinstance(keylist_or_dict, dict):
+            if isinstance(list(keylist_or_dict.values())[0], list):
+                self.listdict = copy.deepcopy(keylist_or_dict)
+            else:
+                self.listdict = {k: [v] for k, v in keylist_or_dict.items()}
+        elif isinstance(keylist_or_dict, ListDict):
+            self.listdict = copy.deepcopy(keylist_or_dict)
+        elif not keylist_or_dict:
+            self.listdict = {}
+        else:
+            print("unkonwn type")
+
+    def raw_dict(self):
+        """
+        returns the Dict object that is iassoicaited with the ListDict object 
+        """
+        return self.listdict
+
+    def append(self, one_dict):
+        for k, v in self.items():
+            v.append(one_dict[k])
+        return self
+
+    def extend(self, newlistdict):
+        for k, v in self.items():
+            v.extend(newlistdict.raw_dict()[k])
+        return self
+
+    def partial_append(self, one_dict):
+        for k, v in one_dict.items():
+            self.listdict[k].append(v)
+        return self
+
+    def partial_extend(self, newlistdict):
+        for k, v in newlistdict.items():
+            self.listdict[k].extend(v)
+        return self
+
+    def __add__(self, newlistdict):
+        return ListDict(merge_two_dicts(self.raw_dict(), newlistdict.raw_dict()))
+
+    def combine(self, newlistdict):
+        self.listdict = merge_two_dicts(
+            self.raw_dict(), newlistdict.raw_dict())
+        # self.listdict = {**self.raw_dict(), **newlistdict.raw_dict()}
+        return self
+
+    def __sub__(self, newlistdict):
+        new_dict = ListDict(self.raw_dict())
+        for k in newlistdict.raw_dict().keys():
+            new_dict.raw_dict().pop(k, None)
+        return new_dict
+
+    def remove(self, newlistdict):
+        for k in newlistdict.raw_dict().keys():
+            self.listdict.pop(k, None)
+        return self
+
+    def chek_error(self):
+        for k, v in self.items():
+            print(len(v), ":", k)
+        return self
+
+    def __getitem__(self, key):
+        return self.listdict[key]
+
+    def __str__(self):
+        return str(self.listdict)
+
+    def __len__(self):
+        return len(self.listdict)
+
+    def keys(self):
+        return self.listdict.keys()
+
+    def values(self):
+        return self.listdict.values()
+
+    def items(self):
+        return self.listdict.items()
+
+
+def log_setup(setup, setups_file):
+    """
+    update an exisiting CSV file or create new one if not exisiting using setup
+    """
+    setup_ld = ListDict(setup)
+    if os.path.isfile(setups_file):
+        old_ld = ListDict(pd.read_csv(setups_file, sep=",").to_dict("list"))
+        old_ld.append(setup)
+        setup_ld = old_ld
+    pd.DataFrame(setup_ld.raw_dict()).to_csv(setups_file, sep=",", index=False)
+
+
+def save_results(save_file, results):
+    pd.DataFrame(results.raw_dict()).to_csv(save_file, sep=",", index=False)
+
+
+def load_results(load_file):
+    if os.path.isfile(load_file):
+        df = pd.read_csv(load_file, sep=",")
+        return ListDict(df.to_dict("list"))
+    else:
+        print(" ########## WARNING : no file names : {}".format(load_file))
+        return None
