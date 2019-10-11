@@ -54,7 +54,7 @@ def render_evaluate_features(obj_file,camera_distance,elevation,azimuth,light_di
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)[0]
+    images = renderer(vertices, faces, textures,)
 #     print(type(images)) ;  print(len(images)) ; print(images.shape)
 #     if not data_dir:
 #         data_dir , filename = os.path.split(obj_file)
@@ -452,7 +452,7 @@ def evaluate_robustness(model, shapes_list, class_label, camera_distance, elevat
             renderer.eye = nr.get_points_from_angles(
                 camera_distance, elevation, azimuth)
             # [batch_size, RGB, image_size, image_size]
-            images = renderer(vertices, faces, textures,)[0]
+            images = renderer(vertices, faces, textures,)
             with torch.no_grad():
                 prop = torch.functional.F.softmax(model(images), dim=1)
                 class_profile.append(torch.max(prop, 1)[
@@ -496,7 +496,7 @@ def render_from_point(obj_file, camera_distance, elevation, azimuth, image_size,
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)[0]
+    images = renderer(vertices, faces, textures,)
     filename = os.path.split(obj_file)[1]
     if not data_dir:
         data_dir, filename = os.path.split(obj_file)
@@ -540,7 +540,7 @@ def render_region(obj_file, camera_distance, elevations, azimuths, image_size, d
                 camera_distance, elevation, azimuth)
 
             # [batch_size, RGB, image_size, image_size]
-            images = renderer(vertices, faces, textures,)[0]
+            images = renderer(vertices, faces, textures,)
             file = os.path.join(data_dir, "examples", filename,
                                 "%d_%d.jpg" % (elevation, azimuth))
             path, _ = os.path.split(file)
@@ -555,9 +555,10 @@ def render_region(obj_file, camera_distance, elevations, azimuths, image_size, d
                                  "%s_college.png" % (filename)), make_grid(np.array(image_collection),nrow=4))
 
 
-def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_direction=[0, 1, 0], image_size=224, data_dir=None, model=None, class_label=0):
+def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_direction=[0, 1, 0], image_size=224, data_dir=None, model=None, class_label=0,save_image=True,device=None):
     texture_size = 2
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    if not device:
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # load .obj
     vertices, faces = nr.load_obj(obj_file)
@@ -575,10 +576,10 @@ def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_directi
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)[0]
-    print(type(images))
-    print(len(images))
-    print(images.shape)
+    images = renderer(vertices, faces, textures,)
+    # print(type(images))
+    # print(len(images))
+    # print(images.shape)
     if not data_dir:
         data_dir, filename = os.path.split(obj_file)
         filename = os.path.splitext(filename)[0]
@@ -586,8 +587,8 @@ def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_directi
         filename = "class"
     image = images.detach().cpu().numpy()[0].transpose(
         (1, 2, 0))  # [image_size, image_size, RGB]
-    imageio.imsave(os.path.join(data_dir, "examples", filename + "_%d_%d_%d.jpg" %
-                        (azimuth, elevation, camera_distance)), (255 * image).astype(np.uint8))
+    if save_image:
+        imageio.imsave(os.path.join(data_dir, "examples", filename + "_%d_%d_%d.jpg" %(azimuth, elevation, camera_distance)), (255 * image).astype(np.uint8))
     if model:
         with torch.no_grad():
             prop = torch.functional.F.softmax(model(images), dim=1)
@@ -626,6 +627,16 @@ def query_gradient(renderer, obj_class, querry_point):
     loss.backward(retain_graph=True)
     return renderer.azimuth.grad.cpu().numpy()
 
+
+def query_gradient_1(renderer, obj_class):
+    prop = renderer()
+    # torch.from_numpy(np.tile(np.eye(1000)[obj_class],(1,prop.size()[0]))).float().to(device)
+    labels = torch.tensor([obj_class]).to(renderer.device)
+    criterion = nn.CrossEntropyLoss()
+    loss = criterion(prop, labels)
+    renderer.zero_grad()
+    loss.backward(retain_graph=True)
+    return renderer.azimuth.grad.cpu().numpy()
 
 def query_gradient_2(renderer, obj_class, querry_point):
     prop = renderer(querry_point)

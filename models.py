@@ -74,7 +74,7 @@ class renderer_model_2(nn.Module):
             np.array(eval_point[1])).float().to(self.device))
         self.renderer.eye = nr.get_points_from_angles(
             self.camera_distance, self.elevation, self.azimuth)
-        images = self.renderer(self.vertices, self.faces, self.textures)[0]
+        images = self.renderer(self.vertices, self.faces, self.textures)
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
         prop = torch.functional.F.softmax(self.network_model(images), dim=1)
@@ -117,15 +117,69 @@ class renderer_model(nn.Module):
             np.array(azimuth)).float().to(self.device))
         self.renderer.eye = nr.get_points_from_angles(
             self.camera_distance, self.elevation, self.azimuth)
-        images = self.renderer(self.vertices, self.faces, self.textures)[0]
+        images = self.renderer(self.vertices, self.faces, self.textures)
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
         prop = torch.functional.F.softmax(self.network_model(images), dim=1)
 
         return prop
 
-    from interval import interval
 
+class renderer_model_1(nn.Module):
+    def __init__(self, network_model, vertices, faces, camera_distance, elevation, azimuth, image_size, device=None):
+        super(renderer_model_1, self).__init__()
+        self.vertices = vertices.to(device)
+        self.faces = faces.to(device)
+
+        # create textures
+        texture_size = 2
+        self.textures = torch.ones(self.faces.shape[0], self.faces.shape[1],texture_size, texture_size, texture_size, 3, dtype=torch.float32).requires_grad_(requires_grad=False).to(device)
+        # self.register_buffer('textures', textures)
+        self.device = device
+
+        # define the DNN model as part of the model of the renderer
+        self.network_model = network_model
+
+        self.camera_distance = torch.from_numpy(np.array(camera_distance)).float(
+        ).unsqueeze_(0).requires_grad_(requires_grad=False).to(self.device)
+        self.elevation = torch.from_numpy(np.array(elevation)).float(
+        ).unsqueeze_(0).requires_grad_(requires_grad=False).to(self.device)
+
+
+        # camera parameters
+#         self.camera_position = nn.Parameter(torch.from_numpy(np.array([6, 10, -14], dtype=np.float32)))
+        self.azimuth = nn.Parameter(torch.from_numpy(np.array(azimuth)).float().unsqueeze_(0))
+        renderer = nr.Renderer(camera_mode='look_at',
+                               image_size=image_size)
+        self.renderer = renderer
+
+        # setup renderer
+        
+#         renderer.eye = self.camera_position
+
+    def forward(self):
+        # self.azimuth.data.set_(torch.from_numpy(
+        #     np.array(azimuth)).float().to(self.device))
+
+
+        self.renderer.eye = nr.get_points_from_angles(self.camera_distance, self.elevation, self.azimuth)
+        images = self.renderer(self.vertices, self.faces, self.textures)
+#         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
+#         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
+        prop = torch.functional.F.softmax(self.network_model(images), dim=1)
+
+        return prop
+
+    def backward_(self, obj_class):
+        with torch.autograd.set_detect_anomaly(True):
+            prop = self.forward()
+            # torch.from_numpy(np.tile(np.eye(1000)[obj_class],(1,prop.size()[0]))).float().to(device)
+            labels = torch.tensor([obj_class]).to(self.device)
+            criterion = nn.CrossEntropyLoss()
+            loss = criterion(prop, labels)
+            self.zero_grad()
+            loss.backward(retain_graph=False)
+        return self.azimuth.grad.cpu().numpy()
 
 class ndinterval():
     def __init__(self, a, b):
