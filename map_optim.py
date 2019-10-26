@@ -1,9 +1,5 @@
 from __future__ import division, print_function, absolute_import
 
-from hyperopt import STATUS_OK
-from hyperopt import fmin
-from hyperopt import Trials
-from hyperopt import rand, tpe
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 import logging
 import pandas as pd
@@ -69,43 +65,41 @@ def main(network,exp, cluster,gpu,override,samples_nb,fix):
         print("NO available network with this name ... Sorry !")
         raise Exception("NO NETWORK")
     models_dicts = {network_name: network_model}
-    save_file = os.path.join(scores_dir, "SRVR_scores_{}_{}.csv".format(exp,str(list(network_name)[0])))
+    # save_file = os.path.join(scores_dir, "SRVR_scores_{}_{}.csv".format(exp,str(list(network_name)[0])))
 
     if bool(fix) :
-        fix_list = [(2, 0), (2, 2), (2, 3), (3, 6), (7, 1), (7, 3), (7, 4)]
-        save_file = os.path.join(scores_dir, "SRVR_scores_{}_{}_fix.csv".format(exp, str(list(network_name)[0])))
+        fix_list = [(x, y) for x in range(10) for y in range(10)]
+        # save_file = os.path.join(scores_dir, "SRVR_scores_{}_{}_fix.csv".format(exp, str(list(network_name)[0])))
 
 
 
-    final_results = ListDict(["network", "point_nb", "class_nb",
-                          "azimuth", "method", "object_nb", "elevation", "pred"])
+    # final_results = ListDict(["network", "point_nb", "class_nb",
+    #                       "azimuth", "method", "object_nb", "elevation", "pred"])
 
 
     # models_dicts = {"ResNet50":resnet , "AlexNet": alexnet , "VGG":vgg , "Inceptionv3":incept}
-    if exp == "random":
+    if exp == "map":
         if not bool(fix) :
             for class_nb in range(10):
                 for object_nb in range(10):
                     print("class: {}  object: {}".format(class_nb, object_nb))
-                    random_SRVR(network_name, class_nb, object_nb, samples_nb,
-                                final_results, save_file, override, models_dicts, device)
+                    map_SRVR(network_name, class_nb, object_nb, samples_nb, override, models_dicts, device)
         else :
-            for class_nb, object_nb in fix_list:
-                print("class: {}  object: {}".format(class_nb, object_nb))
-                random_SRVR(network_name, class_nb, object_nb, samples_nb,
-                            final_results, save_file, override, models_dicts, device)
-    elif exp == "bay":
+            class_nb, object_nb = fix_list[samples_nb]
+            print("class: {}  object: {}".format(class_nb, object_nb))
+            map_SRVR(network_name, class_nb, object_nb,samples_nb, override, models_dicts, device)
+    elif exp == "optim":
         if not bool(fix):
             for class_nb in range(10):
                 for object_nb in range(10):
                     print("class: {}  object: {}".format(class_nb, object_nb))
-                    bayesian_SRVR(network_name, class_nb, object_nb, samples_nb,
-                                final_results, save_file, override, models_dicts, device)
+                    optim_SRVR(network_name, class_nb, object_nb,
+                             samples_nb, override, models_dicts, device)
         else:
-            for class_nb, object_nb in fix_list:
-                print("class: {}  object: {}".format(class_nb, object_nb))
-                bayesian_SRVR(network_name, class_nb, object_nb, samples_nb,
-                              final_results, save_file, override, models_dicts, device)
+            class_nb, object_nb = fix_list[samples_nb]
+            print("class: {}  object: {}".format(class_nb, object_nb))
+            optim_SRVR(network_name, class_nb, object_nb,
+                     samples_nb, override, models_dicts, device)
     
     elif exp == "test":
         class_nb = 6
@@ -127,75 +121,39 @@ def main(network,exp, cluster,gpu,override,samples_nb,fix):
             azimuth, elevation, f_grad([azimuth, elevation])[0], f_grad([azimuth, elevation])[1]))
 
 
-def random_SRVR(network_name, class_nb, object_nb, samples_nb, final_results, save_file, override, models_dicts,device):
-    samples = np.array([np.random.uniform(
-        low=left_limit[ii], high=right_limit[ii], size=samples_nb) for ii in range(len(left_limit))]).T
-    shapes_dir = os.path.join(
-        data_dir, "scale", object_list[class_nb])
-#             shapes_list = list(glob.glob(shapes_dir+"/*"))
-    mesh_file = os.path.join(shapes_dir, TRUE_DICT[str(
-        class_nb)][str(object_nb)], "models", "model_normalized.obj")
-#             mesh_file_list = [os.path.join(x,"models","model_normalized.obj") for x in shapes_list]
-    for point_nb, sample in enumerate(list(samples)):
-        pred = render_evaluate(mesh_file, camera_distance=camera_distance, elevation=sample[1], azimuth=sample[0], light_direction=[
-            0, 1, 0], image_size=image_size, data_dir=data_dir, model=models_dicts[network_name], class_label=obj_class_list[class_nb], save_image=False, device=device)
-        result = {"network": network_name, "class_nb": class_nb, "point_nb": point_nb, "method": "random",
-                  "object_nb": object_nb, "azimuth": sample[0], "elevation": sample[1], "pred": pred}
-        final_results.append(result)
-    if not os.path.isfile(save_file) or bool(override):
-        save_results(save_file=save_file, results=final_results)
+# def random_SRVR(network_name, class_nb, object_nb, samples_nb, final_results, save_file, override, models_dicts,device):
+#     samples = np.array([np.random.uniform(
+#         low=left_limit[ii], high=right_limit[ii], size=samples_nb) for ii in range(len(left_limit))]).T
+#     shapes_dir = os.path.join(
+#         data_dir, "scale", object_list[class_nb])
+# #             shapes_list = list(glob.glob(shapes_dir+"/*"))
+#     mesh_file = os.path.join(shapes_dir, TRUE_DICT[str(
+#         class_nb)][str(object_nb)], "models", "model_normalized.obj")
+# #             mesh_file_list = [os.path.join(x,"models","model_normalized.obj") for x in shapes_list]
+#     for point_nb, sample in enumerate(list(samples)):
+#         pred = render_evaluate(mesh_file, camera_distance=camera_distance, elevation=sample[1], azimuth=sample[0], light_direction=[
+#             0, 1, 0], image_size=image_size, data_dir=data_dir, model=models_dicts[network_name], class_label=obj_class_list[class_nb], save_image=False, device=device)
+#         result = {"network": network_name, "class_nb": class_nb, "point_nb": point_nb, "method": "random",
+#                   "object_nb": object_nb, "azimuth": sample[0], "elevation": sample[1], "pred": pred}
+#         final_results.append(result)
+#     if not os.path.isfile(save_file) or bool(override):
+#         save_results(save_file=save_file, results=final_results)
 
 
-def bayesian_SRVR(network_name, class_nb, object_nb, samples_nb, final_results, save_file, override, models_dicts,device):
-    from hyperopt import hp
-    from hyperopt.pyll.stochastic import sample
-    tpe_trials = Trials()
-    tpe_algo = tpe.suggest
-    vars_list = ["x"+str(ii) for ii in range(len(left_limit))]
-    space = {}
-    for keys in vars_list:
-        space[keys] = hp.uniform(keys, 0, 1)
-    global ITERATION
-    ITERATION = 0
+def map_SRVR(network_name, class_nb, object_nb, samples_nb, override, models_dicts,device):
     shapes_dir = os.path.join(data_dir, "scale", object_list[class_nb])
     mesh_file = os.path.join(shapes_dir, TRUE_DICT[str(class_nb)][str(object_nb)], "models", "model_normalized.obj")
-    def objective(xs):
-        ########### @@@@@@@@@@@@@@@@@ play with the uinput to make it vector !!
-        global ITERATION
-        ITERATION += 1
-        def broadcast_azimuth(xx): return xx * 360.0
-        def broadcast_elevation(xx): return xx * 100.0 - 10
-
-        keylist = xs.keys()
-        list(keylist).sort()
-        x = [xs[ii] for ii in keylist]
-        x[0] = broadcast_azimuth(x[0])
-        x[1] = broadcast_elevation(x[1])
-
-    #     print("@@@@@@@@@@@@@","ITERATION : ", ITERATION)
-        # raise Exception
-        try:
-            pred = render_evaluate(mesh_file, camera_distance=camera_distance, elevation=x[1], azimuth=x[0], light_direction=[
-                0, 1, 0], image_size=image_size, data_dir=data_dir, model=models_dicts[network_name], class_label=obj_class_list[class_nb], save_image=False, device=device)
-        except:
-            try:
-                pred = render_evaluate(mesh_file, camera_distance=camera_distance, elevation=x[1], azimuth=x[0], light_direction=[
-                    0, 1, 0], image_size=image_size, data_dir=data_dir, model=models_dicts[network_name], class_label=obj_class_list[class_nb], save_image=False , device=device)
-            except:
-                pred = result["pred"][-1]
-        result = {"network": network_name, "class_nb": class_nb, "point_nb": ITERATION-1, "method": "bayesian",
-                "object_nb": object_nb, "azimuth": x[0], "elevation": x[1], "pred": float(pred)}
-        final_results.append(result)
-        return {'loss': 1-float(pred), 'xs': xs, 'iteration': ITERATION, 'status': STATUS_OK}
+    map_network_test(models_dicts[network_name], network_name, class_nb, object_nb,
+                                obj_class_list, mesh_file=mesh_file, data_dir=data_dir, override=True, device=device)
 
 
-    tpe_best = fmin(fn=objective, space=space, algo=tpe_algo, trials=tpe_trials,
-                    max_evals=samples_nb, rstate=np.random.RandomState(50))
-    # print('Minimum loss attained with TPE:    {:.4f}'.format(tpe_trials.best_trial['result']['loss']))
-    # self.all_Xs = [[vars_dics[keys] for keys in vars_list]for vars_dics in [x['xs'] for x in tpe_trials.results]]
-    # tpe_results = pd.DataFrame({'loss': [x['loss'] for x in tpe_trials.results], 'iteration': [x['iteration'] for x in tpe_trials.results],'x':self.all_Xs })
-    # tpe_results.to_csv(os.path.join(self.generated_frames_train_dir,'baysian.csv'),sep=',',index=False)
-    save_results(results=final_results, save_file=save_file)
+def optim_SRVR(network_name, class_nb, object_nb, samples_nb, override, models_dicts, device):
+    shapes_dir = os.path.join(data_dir, "scale", object_list[class_nb])
+    mesh_file = os.path.join(shapes_dir, TRUE_DICT[str(
+        class_nb)][str(object_nb)], "models", "model_normalized.obj")
+    all_initial_points = [np.array([130,  30]), np.array([50, 20]), np.array([200,  15]), np.array([310,  50])]
+    test_optimization(models_dicts[network_name], network_name, class_nb, object_nb, all_initial_points,
+                  obj_class_list, mesh_file=mesh_file, setup=None, data_dir=data_dir, override=False, device=device)
 
 if __name__ == '__main__':
     parser = ArgumentParser(description='extract values of summary tags from tensorboard events files and dump it in a csv file',
@@ -203,7 +161,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-n', '--network', required=True, type=str, choices=['incept', 'alexnet', 'vgg',"resnet"],
                         help='network type of the experiments')
-    parser.add_argument('-e', '--exp', required=True, type=str, choices=['random', 'bay',"test"],
+    parser.add_argument('-e', '--exp', required=True, type=str, choices=['map', 'optim',"test"],
                         help='the exp name random or Baysian SRVR exp')
     parser.add_argument('-c', '--cluster', required=True, type=str, choices=['pc', 'semantic'],
                         help='the cluster name')

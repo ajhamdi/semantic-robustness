@@ -54,7 +54,7 @@ def render_evaluate_features(obj_file,camera_distance,elevation,azimuth,light_di
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)
+    images = renderer(vertices, faces, textures,)[0]
 #     print(type(images)) ;  print(len(images)) ; print(images.shape)
 #     if not data_dir:
 #         data_dir , filename = os.path.split(obj_file)
@@ -185,6 +185,40 @@ def map_network(network_model,network_name,class_nb,object_nb,obj_class_list,set
     map_dict = torch.load(file)
     return map_dict
 
+
+def map_network_test(network_model, network_name, class_nb, object_nb, obj_class_list, mesh_file=None, data_dir=None, override=False, device="cuda:0"):
+    camera_distance = 2.732
+    azimuth = 50
+    domain_begin = 0
+    domain_end = 360
+    domain_precision = 5
+    analysis_domain = range(domain_begin, domain_end, domain_precision)
+    elevation = 35
+    image_size = 224
+    a = [0, -10]
+    b = [360, 90]
+    precisions = [3, 3]
+    
+#     object_nb = 1
+
+    vertices, faces = load_mymesh(mesh_file)
+    renderer = renderer_model_2(network_model, vertices, faces,
+                                camera_distance, elevation, azimuth, image_size,device=device).to(device)
+
+    def f(x): return query_robustness(renderer, obj_class_list[class_nb], x)
+    file = os.path.join(data_dir, "checkpoint", network_name,
+                        str(class_nb), str(object_nb), "map.pt")
+    if not os.path.exists(file) or override:
+        z, xx, yy = evaluate_robustness_2(
+            renderer, a, b, precisions, class_nb, obj_class_list)
+        map_dict = {"xx": xx, "yy": yy, "z": z, "class_nb": class_nb,
+                    "network_name": network_name}
+        path, _ = os.path.split(file)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        torch.save(map_dict, file)
+    map_dict = torch.load(file)
+    return map_dict
 
 def optimize_n_boundary(f, f_grad, initial_point, learning_rate=0.1, alpha=0.1, beta=0.01, reg=0.001, n_iterations=500, exp_type="inner", left_limit=np.array([0, -10]), right_limit=np.array([360, 90])):
     optimization_trace = []
@@ -330,8 +364,6 @@ def test_optimization_2(network_model,network_name,class_nb,object_nb,all_initia
 #         class_nb = 1
     camera_distance = 2.732
     azimuth = 50
-    domain_begin = 0 ; domain_end = 360 ; domain_precision = 5
-    analysis_domain = range(domain_begin, domain_end, domain_precision)
     elevation = 35
     image_size = 224
     if setup:
@@ -344,7 +376,7 @@ def test_optimization_2(network_model,network_name,class_nb,object_nb,all_initia
 #     object_nb = 1
     mesh_file = os.path.join(shapes_list[object_nb],"models","model_normalized.obj")
     mesh_file_list = [os.path.join(x,"models","model_normalized.obj") for x in shapes_list]
-    _,shape_id = os.path.split(shapes_list[object_nb])
+    shape_id = os.path.split(shapes_list[object_nb])
     vertices, faces =  load_mymesh(mesh_file)
     renderer =  renderer_model_2(network_model,vertices,faces,camera_distance,elevation,azimuth,image_size,device).to(device)
     f = lambda x:  query_robustness(renderer,obj_class_list[class_nb],x)
@@ -372,6 +404,40 @@ def test_optimization_2(network_model,network_name,class_nb,object_nb,all_initia
     optim_dict = torch.load(file)
     return optim_dict
 
+def test_optimization(network_model,network_name,class_nb,object_nb,all_initial_points,obj_class_list,mesh_file=None,setup=None,data_dir=None,override=False,device="cuda:0"):
+#         class_nb = 1
+    camera_distance = 2.732
+    azimuth = 50
+    elevation = 35
+    image_size = 224
+    if setup:
+        learning_rate=setup["learning_rate"] ; alpha=setup["alpha"] ; beta=setup["beta"]; reg=setup["reg"]  ; n_iterations=setup["n_iterations"]
+    else : 
+        learning_rate=0.1 ;alpha=0.05 ; beta=0.0009 ; reg=0.1 ; n_iterations=800
+
+    vertices, faces =  load_mymesh(mesh_file)
+    renderer =  renderer_model_2(network_model,vertices,faces,camera_distance,elevation,azimuth,image_size,device).to(device)
+    f = lambda x:  query_robustness(renderer,obj_class_list[class_nb],x)
+    f_grad = lambda x: query_gradient_2(renderer,obj_class_list[class_nb],x)
+    exp_type_list = ["OIR_W","naive","OIR_B"]
+    file = os.path.join(data_dir,"checkpoint",network_name,str(class_nb),str(object_nb),"optim.pt" )
+    if not os.path.exists(file) or override:
+        optim_dict = {}
+        for exp in exp_type_list:
+            optim_dict[exp] = {}
+            optim_dict[exp]["optim_trace"] =[] ; optim_dict[exp]["loss_trace"] = [] ; optim_dict[exp]["regions"] = [] 
+        optim_dict["initial_point"] = all_initial_points
+        optim_dict["class_nb"] = class_nb 
+    #     exp_type_list = ["inner","inner_outer_naive","inner_outer_grad","trap"]
+        # network_prop_dicts["Inceptionv3"][class_n][int(initial_point/2)]
+        for initial_point in all_initial_points:
+            for exp in exp_type_list:
+                optimization_trace, loss_trace, result_region = optimize_n_boundary(f,f_grad,initial_point,learning_rate=learning_rate,alpha=alpha,beta=beta,reg=reg,n_iterations=n_iterations,exp_type=exp)
+                optim_dict[exp]["optim_trace"].append(optimization_trace) ; optim_dict[exp]["loss_trace"].append(loss_trace) ; optim_dict[exp]["regions"].append(result_region)
+        #         optim_dict[exp]["optim_trace"] = optimization_trace ; optim_dict[exp]["loss_trace"] = loss_trace ; optim_dict[exp]["regions"] = result_region 
+        torch.save(optim_dict, file)
+    optim_dict = torch.load(file)
+    return optim_dict
 def test_optimization_1(network_model,network_name,class_nb,object_nb,all_initial_points,obj_class_list,object_list,setup=None,data_dir=None,override=False,reduced=False ,device="cuda:0"):
 #         class_nb = 1
     camera_distance = 2.732
@@ -452,7 +518,7 @@ def evaluate_robustness(model, shapes_list, class_label, camera_distance, elevat
             renderer.eye = nr.get_points_from_angles(
                 camera_distance, elevation, azimuth)
             # [batch_size, RGB, image_size, image_size]
-            images = renderer(vertices, faces, textures,)
+            images = renderer(vertices, faces, textures,)[0]
             with torch.no_grad():
                 prop = torch.functional.F.softmax(model(images), dim=1)
                 class_profile.append(torch.max(prop, 1)[
@@ -496,7 +562,7 @@ def render_from_point(obj_file, camera_distance, elevation, azimuth, image_size,
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)
+    images = renderer(vertices, faces, textures,)[0]
     filename = os.path.split(obj_file)[1]
     if not data_dir:
         data_dir, filename = os.path.split(obj_file)
@@ -540,7 +606,7 @@ def render_region(obj_file, camera_distance, elevations, azimuths, image_size, d
                 camera_distance, elevation, azimuth)
 
             # [batch_size, RGB, image_size, image_size]
-            images = renderer(vertices, faces, textures,)
+            images = renderer(vertices, faces, textures,)[0]
             file = os.path.join(data_dir, "examples", filename,
                                 "%d_%d.jpg" % (elevation, azimuth))
             path, _ = os.path.split(file)
@@ -576,7 +642,7 @@ def render_evaluate(obj_file, camera_distance, elevation, azimuth, light_directi
     renderer.eye = nr.get_points_from_angles(
         camera_distance, elevation, azimuth)
     # [batch_size, RGB, image_size, image_size]
-    images = renderer(vertices, faces, textures,)
+    images = renderer(vertices, faces, textures,)[0]
     # print(type(images))
     # print(len(images))
     # print(images.shape)

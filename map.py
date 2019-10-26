@@ -5,13 +5,33 @@ import logging
 import pandas as pd
 import json
 from ops import *
+import torch
+from torchvision import datasets, models, transforms
 from utils import *
 from models import *
+from true_dict import TRUE_DICT
+import imageio
+
+# import tensorflow as tf
 import glob
+import copy
+import pandas as pd
 # from tqdm import tqdm
-from collections import OrderedDict
 import numpy as np
 
+object_list = ['aeroplane', "bathtub", 'bench', 'bottle', 'chair', "cup",
+               "piano", 'rifle', 'vase', "toilet"]  # ["teapot","truck","boat","tv"]
+# this is the list tht represent the 10 classes in ImageNEt class labels
+obj_class_list = [404, 435, 703, 898, 559, 968, 579, 413, 883, 861]
+camera_distance = 2.732
+image_size = 224
+left_limit = np.array([0, -10])
+right_limit = np.array([360, 90])
+data_dir = os.getcwd()
+models_dir = os.path.join(data_dir, "models")
+dataset_root = os.path.join(data_dir, "scale")
+scores_dir = os.path.join(data_dir, "results", "scores")
+sys.path.append(data_dir)
 
 def main(all_shapes, class_nb, object_nb, override, precisions, custom_shapes):
     print(all_shapes, class_nb, object_nb, override, precisions, custom_shapes)

@@ -51,6 +51,14 @@ def listdir_nohidden(path):
             yield f
 
 
+def smooth(y, box_pts):
+    """
+    smooth `y` with window `box_pts`
+    """
+    box = np.ones(box_pts)/box_pts
+    y_smooth = np.convolve(y, box, mode='same')
+    return y_smooth
+
 def make_grid(tensor, nrow=8, padding=2,
               normalize=False, scale_each=False):
     """Code based on https://github.com/pytorch/vision/blob/master/torchvision/utils.py"""

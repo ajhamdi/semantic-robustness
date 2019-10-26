@@ -36,6 +36,187 @@ def list_features_shapenet_classes(class_dir, epoch=160):
             objec_nb_list.append(ii)
     return zip(objec_nb_list, shapes_list)
 
+
+class renderer_model_n(nn.Module):
+    def __init__(self, network_model, vertices, faces, camera_distance, elevation, azimuth, image_size, device=None, light_direction=[0, 1, 0], light_intensity_directional=0.5,texture_color=[1,1,1], n=10):
+        super(renderer_model_n, self).__init__()
+        self.register_buffer('vertices', vertices.to(device))
+        self.register_buffer('faces', faces.to(device))
+        # self.vertices = nn.Parameter(vertices.float()).to(device)
+        # self.faces = nn.Parameter(faces.float()).to(device)
+        # self.register_buffer('light_direction', light_direction)
+        # self.register_buffer('light_intensity_directional',
+        #                      light_intensity_directional)
+        # self.register_buffer('texture_color', texture_color)
+        self.network_model = network_model
+        # create textures
+        texture_size = 2
+        self.device = device
+        self.n = n
+
+        if n == 1:
+            textures = torch.ones(self.faces.shape[0], self.faces.shape[1],texture_size, texture_size, texture_size, 3, dtype=torch.float32)
+            self.register_buffer('textures', textures)
+            self.register_buffer('camera_distance', torch.from_numpy(np.array(camera_distance)).float().unsqueeze_(0))
+            self.azimuth = nn.Parameter(torch.from_numpy(np.array(azimuth)).float().unsqueeze_(0))  # if bach remove unsqueeze
+            self.register_buffer('elevation', torch.from_numpy(np.array(elevation)).float().unsqueeze_(0))
+            self.renderer = nr.Renderer(camera_mode='look_at', image_size=image_size)
+
+
+        elif n == 2:
+            textures = torch.ones(self.faces.shape[0], self.faces.shape[1],texture_size, texture_size, texture_size, 3, dtype=torch.float32)
+            self.register_buffer('textures', textures)
+            self.register_buffer('camera_distance', torch.from_numpy(np.array(camera_distance)).float().unsqueeze_(0))
+            self.azimuth = nn.Parameter(torch.from_numpy(np.array(azimuth)).float().unsqueeze_(0))  # if bach remove unsqueeze
+            self.elevation = nn.Parameter(torch.from_numpy(np.array(elevation)).float().unsqueeze_(0))  # if anthc remove unsqueeze
+            self.renderer = nr.Renderer(camera_mode='look_at', image_size=image_size)
+
+
+        elif n == 3:
+            textures = torch.ones(self.faces.shape[0], self.faces.shape[1],
+                                  texture_size, texture_size, texture_size, 3, dtype=torch.float32)
+            self.register_buffer('textures', textures)
+            self.camera_distance = nn.Parameter(torch.from_numpy(
+                np.array(camera_distance)).float().unsqueeze_(0))
+            self.azimuth = nn.Parameter(torch.from_numpy(np.array(azimuth)).float().unsqueeze_(0))  # if bach remove unsqueeze
+            self.elevation = nn.Parameter(torch.from_numpy(np.array(elevation)).float().unsqueeze_(0))  # if anthc remove unsqueeze
+            self.renderer = nr.Renderer(camera_mode='look_at', image_size=image_size)
+
+
+        elif n == 6 :
+            self.light_direction = nn.Parameter(nn.functional.normalize(
+                torch.FloatTensor(light_direction), dim=0, eps=1e-16).to(self.device))
+            textures = torch.ones(self.faces.shape[0], self.faces.shape[1],
+                                  texture_size, texture_size, texture_size, 3, dtype=torch.float32)
+            self.register_buffer('textures', textures)
+            self.camera_distance = nn.Parameter(torch.from_numpy(
+                np.array(camera_distance)).float().unsqueeze_(0))
+            self.azimuth = nn.Parameter(torch.from_numpy(
+                np.array(azimuth)).float().unsqueeze_(0))  # if bach remove unsqueeze
+            self.elevation = nn.Parameter(torch.from_numpy(np.array(elevation)).float().unsqueeze_(0))  # if anthc remove unsqueeze
+            self.renderer = nr.Renderer(camera_mode='look_at', image_size=image_size, light_direction=self.light_direction)
+
+        elif n == 10:
+            self.light_intensity_directional = nn.Parameter(torch.from_numpy(
+                np.array(light_intensity_directional)).float().unsqueeze_(0).to(self.device))
+            self.light_direction = nn.Parameter(nn.functional.normalize(
+                torch.FloatTensor(light_direction), dim=0, eps=1e-16).to(self.device))
+            self.texture_color = nn.Parameter(torch.torch.from_numpy(
+                np.array(texture_color)).float().to(self.device))
+            textures = torch.ones(self.faces.shape[0], self.faces.shape[1],
+                                  texture_size, texture_size, texture_size, 3, dtype=torch.float32).to(self.device)
+            self.textures = self.texture_color * nn.Parameter(textures)
+            self.camera_distance = nn.Parameter(torch.from_numpy(
+                np.array(camera_distance)).float().unsqueeze_(0))
+            self.azimuth = nn.Parameter(torch.from_numpy(
+                np.array(azimuth)).float().unsqueeze_(0))  # if bach remove unsqueeze
+            self.elevation = nn.Parameter(torch.from_numpy(
+                np.array(elevation)).float().unsqueeze_(0))  # if anthc remove unsqueeze
+            self.renderer = nr.Renderer(camera_mode='look_at', image_size=image_size,
+                                        light_direction=self.light_direction, light_intensity_directional=self.light_intensity_directional)
+
+        elif n == 0:
+            self.texture_color = torch.torch.from_numpy(np.array(texture_color)).float().to(self.device)
+            textures =  torch.ones(self.faces.shape[0], self.faces.shape[1],
+                                  texture_size, texture_size, texture_size, 3, dtype=torch.float32).to(self.device)
+            self.textures = nn.Parameter(self.texture_color * textures)
+            self.register_buffer('light_intensity_directional', torch.from_numpy(
+                np.array(light_intensity_directional)).float().to(self.device))
+            self.register_buffer('light_direction', torch.from_numpy(
+                np.array(light_direction)).float().to(self.device))
+            self.register_buffer('camera_distance', torch.from_numpy(np.array(camera_distance)).float().unsqueeze_(0))
+            self.register_buffer('azimuth', torch.from_numpy(
+                np.array(azimuth)).float().unsqueeze_(0))  # if bach remove unsqueeze
+            self.register_buffer('elevation', torch.from_numpy(np.array(elevation)).float().unsqueeze_(0))
+            self.renderer = nr.Renderer(camera_mode='look_at',
+             image_size=image_size,light_direction=self.light_direction,
+              light_intensity_directional=self.light_intensity_directional)
+            
+    def forward(self):
+        # if self.n == 0:
+        #     self.textures.data.set_(torch.ones(self.faces.shape[0], self.faces.shape[1],
+        #                                        texture_size, texture_size, texture_size, 3, dtype=torch.float32).float().unsqueeze_(0).to(self.device))
+        # if self.n >= 1:
+        #     self.azimuth.data.set_(torch.from_numpy(np.array(eval_point[0])).float().to(self.device))
+        # if self.n >= 2:
+        #     self.elevation.data.set_(torch.from_numpy(np.array(eval_point[1])).float().to(self.device))
+        # if self.n >= 3:
+        #     self.camera_distance.data.set_(torch.from_numpy(np.array(eval_point[2])).float().to(self.device))
+        # if self.n >= 6:
+        #     self.light_direction.data.set_(torch.from_numpy(
+        #         np.array(eval_point[3:6])).float().to(self.device))
+        # if self.n >= 7:
+        #     self.camera_distance.data.set_(torch.from_numpy(np.array(eval_point[2])).float().to(self.device))
+
+        self.renderer.eye = nr.get_points_from_angles(
+            self.camera_distance, self.elevation, self.azimuth)
+        images = self.renderer(self.vertices, self.faces, self.textures)[0]
+#         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
+#         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
+        prop = torch.functional.F.softmax(self.network_model(images), dim=1)
+        return prop
+
+    def render(self):
+        self.renderer.eye = nr.get_points_from_angles(
+            self.camera_distance, self.elevation, self.azimuth)
+        images = self.renderer(self.vertices, self.faces, self.textures)[0]
+        return images.detach().cpu().numpy()[0].transpose((1, 2, 0))
+
+
+    def forward_(self,obj_class):
+        prop = self.forward()
+        return prop[0, obj_class].detach().cpu().numpy()
+
+    def backward_(self, obj_class):
+        prop = self.forward()
+        labels = torch.tensor([obj_class]).to(self.device)
+        criterion = nn.CrossEntropyLoss()
+        loss = criterion(prop, labels)
+        self.zero_grad()
+        loss.backward(retain_graph=False)
+        if self.n ==0:
+            return self.textures.grad.cpu().numpy()
+            # return self.texture_color.grad.cpu().numpy()
+        else :
+            grad_dict = {}
+            grad_list = []
+            if self.n >=1 :
+                grad_list.append(self.azimuth.grad.cpu().numpy().item())
+                grad_dict["azimuth"] = self.azimuth.grad.cpu().numpy().item()
+            if self.n >= 2:
+                grad_list.append(self.elevation.grad.cpu().numpy().item())
+                grad_dict["elevation"] = self.elevation.grad.cpu().numpy().item()
+
+            if self.n >= 3:
+                grad_list.append(
+                    self.camera_distance.grad.cpu().numpy().item())
+                grad_dict["camera_distance"] = self.camera_distance.grad.cpu().numpy().item()
+
+            if self.n >= 6:
+                light_direction_grad = self.light_direction.grad.cpu().numpy()
+                grad_list.extend([*light_direction_grad])
+                grad_dict["light_direction"] = np.array([*light_direction_grad])
+                grad_dict["light_direction_x"] = [*light_direction_grad][0]
+                grad_dict["light_direction_y"] = [*light_direction_grad][1]
+                grad_dict["light_direction_z"] = [*light_direction_grad][2]
+            if self.n >= 7:
+                light_intensity_directional_grad = self.light_intensity_directional.grad.cpu().numpy().item()
+                grad_list.append(light_intensity_directional_grad)
+                grad_dict["light_intensity_directional"] = self.light_intensity_directional.grad.cpu(
+                ).numpy().item()
+
+                # intensity_ambient_grad = self.intensity_ambient.grad.cpu().numpy()
+                # grad_list.append(intensity_ambient_grad)
+            if self.n >=10:
+                color_texture_grad = self.texture_color.grad.cpu().numpy()
+                grad_list.extend([*color_texture_grad])
+                grad_dict["texture_color"] = np.array([*color_texture_grad])
+                grad_dict["texture_color_R"] = [*color_texture_grad][0]
+                grad_dict["texture_color_G"] = [*color_texture_grad][1]
+                grad_dict["texture_color_B"] = [*color_texture_grad][2]
+
+            return grad_dict #,grad_list[0:self.n]
+
 class renderer_model_2(nn.Module):
     def __init__(self, network_model, vertices, faces, camera_distance, elevation, azimuth, image_size, device=None):
         super(renderer_model_2, self).__init__()
@@ -74,7 +255,7 @@ class renderer_model_2(nn.Module):
             np.array(eval_point[1])).float().to(self.device))
         self.renderer.eye = nr.get_points_from_angles(
             self.camera_distance, self.elevation, self.azimuth)
-        images = self.renderer(self.vertices, self.faces, self.textures)
+        images = self.renderer(self.vertices, self.faces, self.textures)[0]
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
         prop = torch.functional.F.softmax(self.network_model(images), dim=1)
@@ -117,7 +298,7 @@ class renderer_model(nn.Module):
             np.array(azimuth)).float().to(self.device))
         self.renderer.eye = nr.get_points_from_angles(
             self.camera_distance, self.elevation, self.azimuth)
-        images = self.renderer(self.vertices, self.faces, self.textures)
+        images = self.renderer(self.vertices, self.faces, self.textures)[0]
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
         prop = torch.functional.F.softmax(self.network_model(images), dim=1)
@@ -163,7 +344,7 @@ class renderer_model_1(nn.Module):
 
 
         self.renderer.eye = nr.get_points_from_angles(self.camera_distance, self.elevation, self.azimuth)
-        images = self.renderer(self.vertices, self.faces, self.textures)
+        images = self.renderer(self.vertices, self.faces, self.textures)[0]
 #         image = images.detach().cpu().numpy()[0].transpose((1, 2, 0))  # [image_size, image_size, RGB]
 #         imsave("/tmp/aa.png",(255*image).astype(np.uint8))
         prop = torch.functional.F.softmax(self.network_model(images), dim=1)
