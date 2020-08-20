@@ -28,7 +28,6 @@ If you find this useful for your research, please use the following.
 - ### Detecting robust regions of the networks with bounds-optimzing algorithms (1D).
 <p float="left">
 <img src='./some_examples/optimization1_video.gif' width=480 /> 
-<img src='./results/run_120.jpg' width=380 />
 </p>
 
 - ### visualizing the Deep networks semantic profiles (2D) for 100 objects from 10 classes.
@@ -39,10 +38,6 @@ If you find this useful for your research, please use the following.
 
 - ### Detecting robust regions of the networks with bounds-optimzing algorithms (2D).
 <img src='./results/bathtub2D.png' align="center" width=500>
-
-
-- ### Visualizinfg the semantic bias in [ImageNet](http://www.image-net.org/) dataset for 10 differnt classes.
-<img src='./results/rifle.png' align="center" width=500>
 
 
 ## Prerequisites
