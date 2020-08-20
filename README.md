@@ -62,7 +62,7 @@ cd semantic-robustness
 
 
 ### Simple Colab Tutorial with a toy example:
-We provide a simple tutorial on colab [here](https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn) to test a toy example on some 3D objects and apply the bound optimzation algorithms for sample points in the 1D case directly on the cloud. The complete results obtained in the `results` directory are obtained as of the following sections  
+We provide a simple tutorial on a Colab notebook [here](https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn) and on Jupyter notebook [here](https://github.com/ajhamdi/semantic-robustness/blob/master/toturial/semantic_robustness_toturial.ipynb) to test a toy example on some 3D objects and apply the bound optimzation algorithms for sample points in the 1D case directly on the cloud. The complete results obtained in the `results` directory are obtained as of the following sections  
 
 
 ### Dataset
