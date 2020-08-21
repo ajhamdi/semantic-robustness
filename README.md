@@ -97,10 +97,11 @@ optim.pt = {
 "initial_point": # the initial point used in the optimization 
 "network_name" : # the network name used in the evaluation ["ResNet50" , "Inceptionv3", "VGG", "AlexNet"]
 "class_nb" : # the class nb [0-9] used in the experiments
-"OIR_W" OR "OIR_B" OR "naive" : #  the type of optimization method used 
-"optim_trace" : # the trace of the bounds through the the optimization (list of traces for every initial point)
-"loss_trace" : #the trace of the loss throug the optimization (list of traces for every initial point)
-"regions": #last region converged to (list of ndintervall class  for every initial point)
+"OIR_W" OR "OIR_B" OR "naive" = #  the type of optimization method used 
+   {"optim_trace" : # the trace of the bounds through the the optimization (list of traces for every initial point)
+    "loss_trace" : #the trace of the loss throug the optimization (list of traces for every initial point)
+    "regions": #last region converged to (list of [ndintervall](fggfd) class  for every initial point) 
+   }
 }
 
 ```
