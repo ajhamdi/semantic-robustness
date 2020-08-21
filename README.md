@@ -102,7 +102,7 @@ The `optim.pt` dictionary contains the following:
 
 
 ### Testing with your own 3D dataset and networks
-- `TODO NEXT`
+- *TODO NEXT*
 
 
 ## Acknowledgments
