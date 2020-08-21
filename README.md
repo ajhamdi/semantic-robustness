@@ -40,7 +40,7 @@ If you find this useful for your research, please use the following.
 <img src='./results/bathtub2D.png' align="center" width=500>
 
 ### Dataset
-- We collect 100 3D shapes from 10 classes from [ShapeNet] details found [here](https://github.com/ajhamdi/semantic-robustness/scale/)
+- We collect 100 3D shapes from 10 classes from [ShapeNet](https://arxiv.org/abs/1512.03012). The details are found [here](https://github.com/ajhamdi/semantic-robustness/scale/)
 
 ## Prerequisites
 - Linux 
