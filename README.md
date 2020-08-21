@@ -39,6 +39,8 @@ If you find this useful for your research, please use the following.
 - ### Detecting robust regions of the networks with bounds-optimzing algorithms (2D).
 <img src='./results/bathtub2D.png' align="center" width=500>
 
+### Dataset
+- We collect 100 3D shapes from 10 classes from [ShapeNet] details found [here](https://github.com/ajhamdi/semantic-robustness/scale/)
 
 ## Prerequisites
 - Linux 
