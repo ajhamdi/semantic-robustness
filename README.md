@@ -4,7 +4,7 @@
 
 # Towards Analyzing Semantic Robustness of Deep Neural Networks (ECCV 2020)
 ### [Paper](https://arxiv.org/pdf/1904.04621.pdf) | [Video](https://youtu.be/rf5ynrBap2Q) | [Tutorial](https://colab.research.google.com/drive/1cZzTPu1uwftnRLqtIIjjqw-YZSKh4QYn). <br>
-Pytorch implementation of the paper in [ECCV'20 Workshop on Adversarial Robustness in the Real World](https://eccv20-adv-workshop.github.io/). The paper tries to address the robustness of Deep Neeural Networks, but not from pixel-level perturbation lense, rather from semantic lense in which the perturbation happens in the latent parameters that generate the image. This typer of robustness for safety-critical applications like self-driving cars in which tolerance of error is very low and risk of failure is high. <br><br>
+Pytorch implementation of the paper in [ECCV'20 Workshop on Adversarial Robustness in the Real World](https://eccv20-adv-workshop.github.io/). The paper tries to address the robustness of Deep Neeural Networks, but not from pixel-level perturbation lense, rather from semantic lense in which the perturbation happens in the latent parameters that generate the image. This type of robustness is important for safety-critical applications like self-driving cars in which tolerance of error is very low and risk of failure is high. <br><br>
 [Towards Analyzing Semantic Robustness of Deep Neural Networks](https://arxiv.org/pdf/1904.04621.pdf)  
  [Abdullah Hamdi](http://www.abdullahamdi.com), [Bernard Ghanem](http://www.bernardghanem.com/)
 
@@ -22,13 +22,6 @@ If you find this useful for your research, please use the following.
 ```
 
 ## Examples of Results
-- ### visualizing the Deep networks average semantic profiles (1D) for 10 objects for 10 classes.
-<img src='./results/toilet.jpg' align="center" width=500>
-
-- ### Detecting robust regions of the networks with bounds-optimzing algorithms (1D).
-<p float="left">
-<img src='./some_examples/optimization1_video.gif' width=480 /> 
-</p>
 
 - ### visualizing the Deep networks semantic profiles (2D) for 100 objects from 10 classes.
 <p float="left">
@@ -74,8 +67,8 @@ We provide a simple tutorial on a Colab notebook [here](https://colab.research.g
 you have to run `map.py` with the following options 
 
 
-1. #### Finding the robust regions of the networks 
-you have to run `test.py` with the following options 
+1. #### Finding the robust regions of the networks by the optimization
+you have to run `optim.py` with the following options 
 
 
 
@@ -90,14 +83,39 @@ The `checkpoint` directory contains the results as dictionaries and is arranged 
     │   └── ...               
     └── ...
 ```
-The optimization test results from `test.py` will be saved as dictionaries to the directory : `./results/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results from `map.py` will be wsaved in `./results/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt`   where:
-- NETWORK_NAME is the name of the network being analyzed 
-- CLASS_NUMBER is the class number (0-9) whcih is part of the 10 3D classes above and also part of ImageNet Classes  
-- OBJECT_NUMBER is the number of the object (0-9) from the 10 objects in that specific class
+The results from `optim.py` will be saved as dictionaries to the directory : `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results from `map.py` will be wsaved in `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt`  where:
+- **NETWORK_NAME** is the name of the network being analyzed 
+- **CLASS_NUMBER** is the class number (0-9) whcih is part of the 10 3D classes above and also part of ImageNet Classes  
+- **OBJECT_NUMBER** is the number of the object (0-9) from the 10 objects in that specific class
 
 The `map.pt` dictionary contains the following:
+```python
+map_dict = torch.load("checkpoint/ResNet50/0/0/map.pt")
+map_dict
+{
+"xx": # azimuth parameters list  
+"yy" : # elevation parameters list
+"z" : # the network confidence 
+}
 
-The `optim.pt` dictionary contains the following:
+```
+
+The `optim.pt` dictionary contains the optimization results as follows:
+```python
+optim_dict = torch.load("checkpoint/ResNet50/0/0/optim.pt")
+optim_dict
+{
+"initial_point": # the initial point used in the optimization 
+"network_name" : # the network name used in the evaluation ["ResNet50" , "Inceptionv3", "VGG", "AlexNet"]
+"class_nb" : # the class nb [0-9] used in the experiments
+"OIR_W" OR "OIR_B" OR "naive" = #  the type of optimization method used 
+   {"optim_trace" : # the trace of the bounds through the the optimization (list of traces for every initial point)
+    "loss_trace" : #the trace of the loss throug the optimization (list of traces for every initial point)
+    "regions": #last region converged to (list of ndintervall class  for every initial point) 
+   }
+}
+
+```
 
 
 
