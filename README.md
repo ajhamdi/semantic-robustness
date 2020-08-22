@@ -61,15 +61,26 @@ We provide a simple tutorial on a Colab notebook [here](https://colab.research.g
 
 <br>
 
-### Running the full experiments
+### Running the experiments
 
 1. #### Mapping the deep networks fully
-you have to run `map.py` with the following options 
-
+you have to run `map.py` like the following:
+```python
+python map.py --network resnet --gpu 0 --class_nb 1 --object_nb 0 --override
+```
 
 1. #### Finding the robust regions of the networks by the optimization
-you have to run `optim.py` with the following options 
+you have to run `optim.py` like the following:
+```python
+python optim.py --network resnet --gpu 0 --class_nb 1 --object_nb 0 --override
+```
+The arguments descriptions are as follows:
 
+- **network** : trained network type used in the experiments, choices=('incept', 'alexnet', 'vgg',"resnet") corresponding to (InceptionV3, ResNet50, VGG, AlexNet)
+- **gpu** : the GPU number in which the exp perfoprmed 
+- **class_nb** : number of the class used for the experiment (0-9) of the [dataset](https://github.com/ajhamdi/semantic-robustness/tree/master/scale)
+- **object_nb** : number of the 3D object used for the experiment (0-9) of the [dataset](https://github.com/ajhamdi/semantic-robustness/tree/master/scale)
+- **override** : a flag to override exisisting results
 
 
 #### saving the results:
@@ -83,10 +94,7 @@ The `checkpoint` directory contains the results as dictionaries and is arranged 
     │   └── ...               
     └── ...
 ```
-The results from `optim.py` will be saved as dictionaries to the directory : `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results from `map.py` will be wsaved in `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt`  where:
-- **NETWORK_NAME** is the name of the network being analyzed 
-- **CLASS_NUMBER** is the class number (0-9) whcih is part of the 10 3D classes above and also part of ImageNet Classes  
-- **OBJECT_NUMBER** is the number of the object (0-9) from the 10 objects in that specific class
+The results from `optim.py` will be saved as dictionaries to the directory : `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results from `map.py` will be wsaved in `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt` 
 
 The `map.pt` dictionary contains the following:
 ```python
