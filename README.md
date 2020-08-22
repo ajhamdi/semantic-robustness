@@ -74,8 +74,7 @@ you have to run `optim.py` with the following command
 ```python
 python optim.py --network resnet --gpu 0 --class_nb 1 --object_nb 0 --override
 ```
-<br>
-the arguments descriptions are as follows:
+The arguments descriptions are as follows:
 
 - **network** : trained network type used in the experiments, choices=('incept', 'alexnet', 'vgg',"resnet") corresponding to (InceptionV3, ResNet50, VGG, AlexNet)
 - **gpu** : the GPU number in which the exp perfoprmed 
@@ -95,10 +94,7 @@ The `checkpoint` directory contains the results as dictionaries and is arranged 
     │   └── ...               
     └── ...
 ```
-The results from `optim.py` will be saved as dictionaries to the directory : `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results from `map.py` will be wsaved in `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt`  where:
-- **NETWORK_NAME** is the name of the network being analyzed 
-- **CLASS_NUMBER** is the class number (0-9) whcih is part of the [dataset](https://github.com/ajhamdi/semantic-robustness/tree/master/scale)
-- **OBJECT_NUMBER** is the number of the object (0-9) whcih is part of the [dataset](https://github.com/ajhamdi/semantic-robustness/tree/master/scale)
+The results from `optim.py` will be saved as dictionaries to the directory : `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/optim.pt`. and the mapping results from `map.py` will be wsaved in `./checkpoint/NETWORK_NAME/CLASS_NUMBER/OBJECT_NUMBER/map.pt` 
 
 The `map.pt` dictionary contains the following:
 ```python
