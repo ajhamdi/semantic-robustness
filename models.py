@@ -24,6 +24,25 @@ type_to_index_map = {
 index_to_type_map = dict([[v, k] for k, v in type_to_index_map.items()])
 
 
+def get_trained_network(network, device):
+    if network == "resnet":
+        network_model = models.resnet50(pretrained=True).eval().to(device)
+        network_name = "ResNet50"
+    elif network == "incept":
+        network_model = models.inception_v3(pretrained=True).eval().to(device)
+        network_model.transform_input = False
+        network_name = "Inceptionv3"
+    elif network == "vgg":
+        network_model = models.vgg11_bn(pretrained=True).eval().to(device)
+        network_name = "VGG"
+    elif network == "alexnet":
+        network_model = models.alexnet(pretrained=True).eval().to(device)
+        network_name = "AlexNet"
+    else:
+        print("NO available network with this name ... Sorry !")
+        raise Exception("NO NETWORK")
+    return network_name, network_model
+
 def list_features_shapenet_classes(class_dir, epoch=160):
     objec_nb_list = []
     shapes_list = list(
