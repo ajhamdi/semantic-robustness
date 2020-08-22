@@ -76,10 +76,11 @@ python optim.py --network resnet --gpu 0 --class_nb 1 --object_nb 0 --override
 ```
 <br>
 the arguments descriptions are as follows:
-- **network** : trained network type used in the experiments, choices=['incept', 'alexnet', 'vgg',"resnet"] corresponding to [InceptionV3, ResNet50, VGG, AlexNet]
+
+- **network** : trained network type used in the experiments, choices=('incept', 'alexnet', 'vgg',"resnet") corresponding to (InceptionV3, ResNet50, VGG, AlexNet)
 - **gpu** : the GPU number in which the exp perfoprmed 
-- **class_nb** : number of the class used for the experiment [0-9] of the [dataset](https://github.com/ajhamdi/semantic-robustness/tree/master/scale)
-- **object_nb** : number of the 3D object used for the experiment [0-9] of the [dataset](https://github.com/ajhamdi/semantic-robustness/tree/master/scale)
+- **class_nb** : number of the class used for the experiment (0-9) of the [dataset](https://github.com/ajhamdi/semantic-robustness/tree/master/scale)
+- **object_nb** : number of the 3D object used for the experiment (0-9) of the [dataset](https://github.com/ajhamdi/semantic-robustness/tree/master/scale)
 - **override** : a flag to override exisisting results
 
 
