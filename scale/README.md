@@ -12,3 +12,16 @@
 1. **toilet** : with ImageNet class label 861
 ## visualization:
 <img src='../results/class_0_.gif' width=150>  <img src='../results/class_1_.gif' width=150>  <img src='../results/class_2_.gif' width=150>  <img src='../results/class_3_.gif' width=150>  <img src='../results/class_4_.gif' width=150>  <img src='../results/class_5_.gif' width=150> <img src='../results/class_6_.gif' width=150>  <img src='../results/class_7_.gif' width=150> <img src='../results/class_8_.gif' width=150>  <img src='../results/class_9_.gif' width=150> 
+<br>
+## mapping every object in the dataset:
+the dictionary at `true_dict.py` cpntains the mappping that maps every **OBJET_NB** and **CLASS_NB** used in the code to a specific 3D object ID in shape Net. The dictionary is ordered as the following :
+
+```python
+TRUE_DICT =
+{
+'cass_nb' : 
+     {
+      `object_nb`: `object_ID`
+      }
+}
+```
