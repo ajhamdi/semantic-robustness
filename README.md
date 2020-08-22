@@ -70,7 +70,7 @@ python map.py --network resnet --gpu 0 --class_nb 1 --object_nb 0 --override
 ```
 
 1. #### Finding the robust regions of the networks by the optimization
-you have to run `optim.py` with the following command 
+you have to run `optim.py` like the following:
 ```python
 python optim.py --network resnet --gpu 0 --class_nb 1 --object_nb 0 --override
 ```
